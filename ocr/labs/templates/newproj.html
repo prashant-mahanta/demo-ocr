@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>New Project</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  
+</head>
+<body>
+
+<div class="container">
+</br>
+ <a href="/logout/" > <button type="button" class="btn btn-dark btn-lg" style="float:right">Logout</button></a>
+  
+  
+  <h2 style="text-align:center">New Project</h2>
+  
+  <form>
+    
+    <div class="form-group">
+      <label for="project_name"><b>Name of the Project</b></label>
+      <textarea class="form-control" rows="1" id="name" name="text" required></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="description"><b>Description:</b></label>
+      <textarea class="form-control" rows="5" id="description" name="text" required></textarea>
+    </div>
+
+    <!--<div class="checkbox">
+      <label for="comment"><b>Labels</b>
+        <br><input type="checkbox" style="text-align:center-left" value=" ">Title</label>
+    </div>-->
+      
+    <!--<div class="checkbox">
+      <label><input type="checkbox" value=" ">Paragraph</label>
+    </div>
+    <div class="checkbox">
+      <label><input type="checkbox" value=" ">Equation</label>
+    </div>
+    <div class="checkbox">
+      <label><input type="checkbox" value=" ">Table</label>
+    </div>
+    <div class="checkbox">
+      <label><input type="checkbox" value=" ">Figure</label>
+    </div>-->
+    <div class="element" id="div_1">
+      <label for="labels"><b>Labels</b></label><br>
+      <input type='text' placeholder="Labels" id="txt_1">&nbsp;<span class='add'>ADD</span>
+     </div>
+    <br>  
+    
+       <div class="file-field">
+        <label for="file"><b>Add File</b></label><br>
+        <div class="btn btn-default btn-sm float-left">
+          
+          <input type="file">
+        </div>
+        <!--<div class="file-path-wrapper">
+          <input class="file-path validate" type="text" placeholder="Upload your file">
+        </div>-->
+      </div>
+    
+    <button type="submit" style="float:right" class="btn btn-primary">Save Changes</button>
+  </form>
+</div>
+  
+
+  <script>
+    $(document).ready(function(){
+
+       // Add new element
+       $(".add").click(function(){
+
+        // Finding total number of elements added
+        var total_element = $(".element").length;
+       
+        // last <div> with element class id
+        var lastid = $(".element:last").attr("id");
+        var split_id = lastid.split("_");
+        var nextindex = Number(split_id[1]) + 1;
+        label_name = document.getElementById("txt_1").value;
+        var max = 10;
+        console.log(label_name);
+        // Check total number elements
+        if(total_element < max ){
+         // Adding new div container after last occurance of element class
+         $(".element:last").after("<div class='element' id='div_"+ nextindex +"'></div>");
+       
+         // Adding element to <div>
+         $("#div_" + nextindex).append("<input type='text' placeholder="+ label_name +" id='txt_"+ nextindex +" value="+ label_name +"' disabled>&nbsp;<span id='remove_" + nextindex + "' class='remove'>X</span>");
+       
+        }
+       
+       });
+
+       // Remove element
+       $('.container').on('click','.remove',function(){
+       
+        var id = this.id;
+        var split_id = id.split("_");
+        var deleteindex = split_id[1];
+
+        // Remove <div> with id
+        $("#div_" + deleteindex).remove();
+
+       }); 
+  });
+
+  </script>
+</body>
+</html>

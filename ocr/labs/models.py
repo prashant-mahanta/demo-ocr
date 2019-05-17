@@ -33,7 +33,8 @@ class MyUserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault('lab_id', 7)
+        lab = Lab.objects.get(labname='AA')
+        extra_fields.setdefault('lab_id', lab)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('usertype', 0)
         extra_fields.setdefault('is_active', True)
