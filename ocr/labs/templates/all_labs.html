@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+{% load static %}
 <head>
 	<!-- Required meta tags -->
     <meta charset="utf-8">
@@ -9,7 +10,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     
 
-	<title>Projects</title>
+	<title>Labs</title>
 
 	<style >
 	</style>
@@ -27,29 +28,24 @@
   		<div class="card-body">
         
          <div class="row">
-             <button type="button" class="btn btn-secondary btn-lg" style="float: left">  Projects </button>
-             <a href="#" ><button type="button" class="btn btn-info btn-lg" style="float: right"> Add Project </button></a>
+             <button type="button" class="btn btn-secondary btn-lg" style="float: left">  LABS </button>
+             
          </div>
       </br>
 
-      <!-- for loop of projects -->
-      <div class="card">
-        <div class="card-body">
-          <div class="row">
-            <h4> Project 1 </h4>
+    {% if labs %}
+      <!-- for loop of Labs -->
+      {% for lab in labs %}
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <h5><a href="/lab/{{lab.id}}/"> {{lab.labname}} </a> </h5>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <div class="row">
-            <h4> Project 2 </h4>
-        </div>
-        </div>
-      </div>
-        
+      {% endfor %}
    		<!-- loop ends here -->
+    {% endif %}
     	</div>
   		</div>
 	</div>

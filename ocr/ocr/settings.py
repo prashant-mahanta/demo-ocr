@@ -86,11 +86,11 @@ DATABASES = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql.connector.django',
-        # 'ENGINE': 'django.db.backends.mysql',
+        # 'ENGINE': 'mysql.connector.django',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ocr',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': '',
         # 'HOST': 'localhost',
         # 'PORT': '',
     }
@@ -137,7 +137,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
