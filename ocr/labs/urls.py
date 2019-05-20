@@ -10,16 +10,22 @@ app_name = 'labs'
 
 urlpatterns = [
 	path('', main, name="main"),
+
 	path('login/', signIn, name="signIn"),
 	path('logout/', logout_user, name="logout_user"),
+
 	path('lab/', labProjects, name="labProjects"),
 	path('lab/<int:lab_id>/', labProjects, name="labProjects"),
+
 	path('project/<int:project_id>/', projectPage, name="projectPage"),
-	path('new-project/', addNewProject, name="addNewProject"),
+	path('new-project/<int:lab_id>/', addNewProject, name="addNewProject"),
+
 	# labs section for admin
 	path('all-labs/', allLabs, name="allLabs"),
+
 	# api to post 
 
 	# APIS to store and retrieve labels
 	path('labels/', LabelsView.as_view(), name="LabelsView"),
+
 ]

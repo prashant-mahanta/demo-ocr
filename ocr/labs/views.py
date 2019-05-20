@@ -121,17 +121,31 @@ def loginTrail(request, email, status):
 							model=model, os=os)
 		trail.save()
 
-@login_required(login_url='/')
-def projectPage(request, project_id=None):
-	return HttpResponse("link pages")
 
 @login_required(login_url='/')
-def addNewProject(request):
-	return render(request, 'newproj.html')
+def projectPage(request, project_id=None):
+	project = Projects.objects.get(id=project_id)
+	context = {}
+	context["project"] = project
+	email = request.user.email
+	user = User.objects.get(email=email)
+	context["user"] = user
+	return render(request, "seg-tool-test.html", context)
+
+
+@login_required(login_url='/')
+def addNewProject(request, lab_id=None):
+	email = request.user.email
+	user = User.objects.get(email=email)
+	context = {}
+	context["user"] = user
+	context["lab_id"] = lab_id
+	return render(request, 'newproj.html', context)
 
 
 
 # -------------------------- APIs ---------------------------
+# @login_required(login_url='/')
 class LabelsView(APIView):
 	permission_classes = [AllowAny]
 
@@ -143,4 +157,22 @@ class LabelsView(APIView):
 		return Response(serialized_object.data)
 
 	# POST request
-	# def post(self, request, format=None):
+	def post(self, request, format=None):
+		lab_id = request.data.get("lab_id")
+		project_name = request.data.get("project_name")
+		description = request.data.get("description")
+		labels = request.data.getlist("labels[]")
+
+		# u = User.objects.get(id=int(user))
+		lab = Lab.objects.get(id=int(lab_id))
+		project = Projects(lab_id=lab, project_name=project_name, description=description, created_by=request.user.email)
+		project.save()
+		for i in range(len(labels)):
+			ln, color = labels[i].split(',')
+			label = Labels(project_id=project, label_name=ln, color=color, created_by=request.user.email)
+			label.save()
+		# print(lab_id, project_name, description, labels)
+		objects = Labels.objects.filter(project_id=project)
+		serialized_object = LabelSerializer(objects, many=True)
+		
+		return Response(serialized_object.data)
