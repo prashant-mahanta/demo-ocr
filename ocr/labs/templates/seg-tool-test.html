@@ -536,7 +536,6 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
           <!-- <li><a onclick="display_add_region_popup()" title="New Region">New Region</a></li> -->
           {% if user.usertype == 0 %}
             <li><a href="/all-labs/" title="Labs">Labs</a></li>
-
           {% else %}
             <li><a href="/lab/{{project.lab_id.id}}" title="Projects">Projects</a></li>
           {% endif %}
