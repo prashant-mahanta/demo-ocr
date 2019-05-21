@@ -29,7 +29,12 @@
         
          <div class="row">
           <div class="col">
+
              <button type="button" class="btn btn-secondary btn-lg" style="float: left"> Projects </button>
+             &nbsp;&nbsp;
+             {% if user.usertype == 0%}
+               <a href="/all-labs/"><button type="button" class="btn btn-secondary btn-lg" > Labs </button></a>
+            {% endif %}
              </div>
              <div class="col">
              <a href="/new-project/{{lab.id}}/" ><button type="button" class="btn btn-info btn-lg" style="float: right"> Add Project </button></a>

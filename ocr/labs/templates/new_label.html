@@ -2,7 +2,7 @@
 {% load static %}
 <html lang="en">
 <head>
-  <title>New Project</title>
+  <title>New Label</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -23,37 +23,20 @@
  <a href="/logout/" > <button type="button" class="btn btn-dark btn-lg" style="float:right">Logout</button></a>
   
   
-  <h2 style="text-align:center">New Project</h2>
+  <h2 style="text-align:center">Add Labels</h2>
   </br>
   <!-- <form> -->
     
     <div class="form-group">
       <label for="project_name"><b>Name of the Project</b></label>
-      <textarea class="form-control" rows="1" id="name" name="text" required></textarea>
+      <textarea class="form-control" rows="1" id="name" name="text" value="{{project.project_name}}" placeholder="{{project.project_name}}" disabled></textarea>
     </div>
     
     <div class="form-group">
       <label for="description"><b>Description:</b></label>
-      <textarea class="form-control" rows="5" id="description" name="text" required></textarea>
+      <textarea class="form-control" rows="5" id="description" name="text" value="{{project.description}}" placeholder="{{project.description}}" disabled></textarea>
     </div>
 
-    <!--<div class="checkbox">
-      <label for="comment"><b>Labels</b>
-        <br><input type="checkbox" style="text-align:center-left" value=" ">Title</label>
-    </div>-->
-      
-    <!--<div class="checkbox">
-      <label><input type="checkbox" value=" ">Paragraph</label>
-    </div>
-    <div class="checkbox">
-      <label><input type="checkbox" value=" ">Equation</label>
-    </div>
-    <div class="checkbox">
-      <label><input type="checkbox" value=" ">Table</label>
-    </div>
-    <div class="checkbox">
-      <label><input type="checkbox" value=" ">Figure</label>
-    </div>-->
     <div class="element" id="div_1">
       <label for="labels"><b>Labels</b></label><br>
       <input type='text' placeholder="Labels" id="txt_1" value="">&nbsp;<input type="color" id="region_color" name="region_color"
@@ -81,10 +64,6 @@
   <script>
 
     function saveProject(){
-        project_name = document.getElementById("name").value;
-        description = document.getElementById("description").value;
-        if(project_name !== "" && description !== "")
-        {
           var labels = [];
           var total_element = $(".element").length;
           console.log(total_element);
@@ -115,15 +94,13 @@
               // cache: false,
               // contentType: false,
               // processData: false,
-              data: {"csrfmiddlewaretoken" : "{{ csrf_token }}" ,"lab_id":"{{lab_id}}", "project_name": project_name, "description": description, "labels[]": labels},
+              data: {"csrfmiddlewaretoken" : "{{ csrf_token }}" ,"lab_id":"{{lab_id}}", "labels[]": labels, "project_id": "{{ project.id }}"},
               success : function (value) {
                 console.log("success");
                 // console.log(data);
               }
 
           }); 
-          // return false;
-      }
 
     };
 

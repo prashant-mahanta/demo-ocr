@@ -19,6 +19,7 @@ urlpatterns = [
 
 	path('project/<int:project_id>/', projectPage, name="projectPage"),
 	path('new-project/<int:lab_id>/', addNewProject, name="addNewProject"),
+	path('add_labels/<int:project_id>/', addLabels, name="addLabels"),
 
 	# labs section for admin
 	path('all-labs/', allLabs, name="allLabs"),
@@ -27,5 +28,5 @@ urlpatterns = [
 
 	# APIS to store and retrieve labels
 	path('labels/', LabelsView.as_view(), name="LabelsView"),
-
+	path('labels/<int:lab_id>/<int:project_id>/', LabelsView.as_view(), name="LabelsView"),
 ]

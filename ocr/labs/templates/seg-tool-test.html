@@ -5,6 +5,9 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
     <meta charset="UTF-8">
     <title>Layout Analysis Tool</title>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <!-- CSS style definition -->
     <style type="text/css">
       body {
@@ -530,7 +533,7 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
               <a onclick="change_region_title()" title="Change Region type to Title">Title</a> -->
             </div>
           </li>
-          <li><a onclick="display_add_region_popup()" title="New Region">New Region</a></li>
+          <!-- <li><a onclick="display_add_region_popup()" title="New Region">New Region</a></li> -->
           {% if user.usertype == 0 %}
             <li><a href="/all-labs/" title="Labs">Labs</a></li>
 
@@ -812,7 +815,8 @@ var _loaded_img_file_attr_miss_count = [];
 var _loaded_img_table_html = [];
 
 //Legend to identify types of B.box
-var legendList = {text: '#66ff99',graphic: '#ff0000', equation: '#0000ff', title: '#ffff00' };
+// var legendList = {text: '#66ff99',graphic: '#ff0000', equation: '#0000ff', title: '#ffff00' };
+var legendList = {};
 
 
 // UI html elements
@@ -899,7 +903,30 @@ function populate_region_list(legendList) {
 //
 function _init() {
   show_home_panel();
-  populate_region_list(legendList);
+  // get all the labels and store in legendList
+  // console.log("{{project.id}}");
+  $.ajax({
+        type: "GET",
+        url : "/labels/{{project.lab_id.id}}/{{project.id}}/",
+        success : function (value) {
+          console.log(value);
+          for(var i in value){
+            var label = value[i].label_name;
+            console.log(label);
+            var col = value[i].color;
+            console.log(col);
+            legendList[label] = col;
+          }
+
+          console.log(legendList);
+          populate_region_list(legendList);
+        }
+
+  }); 
+
+  
+  // console.log("eandddd");
+  // populate_region_list(legendList);
 
   _is_local_storage_available = check_local_storage();
   if (_is_local_storage_available) {

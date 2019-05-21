@@ -62,19 +62,21 @@ def signIn(request):
 @login_required(login_url='/')
 def labProjects(request, lab_id=None):
 	if request.user.is_authenticated:
+		user = User.objects.get(email=request.user.email)
 		if lab_id is None:
-			user = User.objects.get(email=request.user.email)
 			lab_id = user.lab_id.id
 			projects = Projects.objects.filter(lab_id=lab_id)
 			context = {"projects": projects}
 			lab = Lab.objects.get(id=lab_id)
 			context["lab"] = lab
+			context["user"] = user
 			return render(request, "projects.html", context)
 		else:
 			projects = Projects.objects.filter(lab_id=lab_id)
 			context = {"projects": projects}
 			lab = Lab.objects.get(id=lab_id)
 			context["lab"] = lab
+			context["user"] = user
 			return render(request, "projects.html", context)
 	else:
 		return HttpResponseRedirect('/')
@@ -144,16 +146,32 @@ def addNewProject(request, lab_id=None):
 
 
 
+@login_required(login_url='/')
+def addLabels(request, project_id=None):
+	email = request.user.email
+	user = User.objects.get(email=email)
+	project = Projects.objects.get(id=project_id)
+	lab_id = project.lab_id.id
+	context = {}
+	context["project"] = project
+	context["user"] = user
+	context["lab_id"] = lab_id
+	return render(request, "new_label.html", context)
+
 # -------------------------- APIs ---------------------------
 # @login_required(login_url='/')
 class LabelsView(APIView):
 	permission_classes = [AllowAny]
 
 	# GET request
-	def get(self, request, format=None):
-		objects = Labels.objects.all()
-		serialized_object = LabelSerializer(objects, many=True)
-
+	def get(self, request, format=None, lab_id=None, project_id=None):
+		if lab_id is None and project_id is None:
+			objects = Labels.objects.all()
+			serialized_object = LabelSerializer(objects, many=True)
+		else:
+			project = Projects.objects.get(id=int(project_id))
+			label = Labels.objects.filter(project_id=project)
+			serialized_object = LabelSerializer(label, many=True)
 		return Response(serialized_object.data)
 
 	# POST request
@@ -162,17 +180,29 @@ class LabelsView(APIView):
 		project_name = request.data.get("project_name")
 		description = request.data.get("description")
 		labels = request.data.getlist("labels[]")
+		project_id = request.data.get("project_id")
+		if lab_id is not None and project_name is not None and description is not None and labels is not None:
 
-		# u = User.objects.get(id=int(user))
-		lab = Lab.objects.get(id=int(lab_id))
-		project = Projects(lab_id=lab, project_name=project_name, description=description, created_by=request.user.email)
-		project.save()
-		for i in range(len(labels)):
-			ln, color = labels[i].split(',')
-			label = Labels(project_id=project, label_name=ln, color=color, created_by=request.user.email)
-			label.save()
-		# print(lab_id, project_name, description, labels)
-		objects = Labels.objects.filter(project_id=project)
-		serialized_object = LabelSerializer(objects, many=True)
-		
+			# u = User.objects.get(id=int(user))
+			lab = Lab.objects.get(id=int(lab_id))
+			project = Projects(lab_id=lab, project_name=project_name, description=description, created_by=request.user.email)
+			project.save()
+			for i in range(len(labels)):
+				ln, color = labels[i].split(',')
+				label = Labels(project_id=project, label_name=ln, color=color, created_by=request.user.email)
+				label.save()
+			# print(lab_id, project_name, description, labels)
+			objects = Labels.objects.filter(project_id=project)
+			serialized_object = LabelSerializer(objects, many=True)
+
+		elif lab_id is not None and labels is not None and project_id is not None:
+			lab = Lab.objects.get(id=int(lab_id))
+			project = Projects.objects.get(id=int(project_id))
+			for i in range(len(labels)):
+				ln, color = labels[i].split(",")
+				label = Labels(project_id=project, label_name=ln, color=color, created_by=request.user.email)
+				label.save()
+			objects = Labels.objects.filter(project_id=project)
+			serialized_object = LabelSerializer(objects, many=True)
+
 		return Response(serialized_object.data)
