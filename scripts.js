@@ -149,6 +149,7 @@ var BBOX_SELECTED_FILL_COLOR           = "#ffffff";
 
 // User DIVs stored here
 var label_id;
+var legendListDesc = {};
 //
 // Data structure for annotations
 //
@@ -180,7 +181,7 @@ function populate_region_list(legendList, label_id) {
         var boxContainer = document.createElement("DIV");
         var box = document.createElement("DIV");
         var label = document.createElement("SPAN");
-
+        boxContainer.setAttribute('title', legendListDesc[key]);
         label.innerHTML = key;
         box.className = "box";
         box.style.backgroundColor = legendList[key];
@@ -339,7 +340,7 @@ function set_variables(){
 
 //Legend to identify types of B.box
  legendList = {};
-
+ legendListDesc = {};
 
 // UI html elements
  invisible_file_input = document.getElementById("invisible_file_input");
@@ -363,12 +364,13 @@ function set_variables(){
 }
 function _init(event) {
   set_variables();
-  label_id = event["id"];
+  label_id = event["region_div"];
   show_home_panel();
-  var labels = event["labels"];
+  var labels = event["region"];
   
-  for(var key in labels){
-    legendList[key] = labels[key];
+  for (var i = 0; i < labels.length; i++) {
+    legendList[ labels[i]["region_name"] ] = labels[i]["region_color"];
+    legendListDesc[ labels[i]["region_name"] ] = labels[i]["region_description"];
   }
   // console.log(legendList);
   populate_region_list(legendList, label_id);
@@ -3820,12 +3822,18 @@ window.onclick = function(event) {
 }
 }
 
-function validateFormOnSubmit(){
-  var region_name = document.getElementById("region_name");
-  var region_color = document.getElementById("region_color");
+function validateFormOnSubmit(data){
+  var region_name = document.getElementById(data["region_name_id"]);
+  var region_color = document.getElementById(data["region_color_id"]);
+  var region_description = document.getElementById(data["region_desc_id"]);
+  // console.log(region_name);
+  // console.log(region_color);
+  // console.log(region_description);
+
   if(region_name.value != "" ) {
     console.log("submitted")
     legendList[region_name.value] = region_color.value;
+    legendListDesc[region_name.value] = region_description.value;
     populate_region_list(legendList, label_id);
     var modal = document.getElementById('myModal');
     modal.style.display = "none";

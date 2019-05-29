@@ -551,10 +551,12 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
    
     <!-- <form action="#" onsubmit="return validateFormOnSubmit(this);"> -->
       <p style="color:black;">Region Name : </p><input type="text" name="region_name" placeholder= "region name" id="region_name" value="" required><br>
+      <p style="color:black;">Region Description : </p><input type="text" name="region_desc" placeholder= "Region Description" id="region_desc" value="" required><br>
       <input type="color" id="region_color" name="region_color"
            value="#e66465">
     <label for="head">Head</label>
-      <input type="submit" value="Submit" onclick="validateFormOnSubmit()">
+
+      <input type="submit" value="Submit" onclick="validateFormOnSubmit({ region_name_id: 'region_name', region_desc_id: 'region_desc', region_color_id: 'region_color'})">
       <!-- </form> -->
    <!-- <input type="text" name="fname"><br> -->
   </div>
@@ -597,10 +599,15 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
         <div class="leftsidebar_accordion_panel show" id="accordion_region_shape_panel">
           <ul class="region_shape">
             <li id="region_shape_rect" class="selected" onclick="select_region_shape('rect')" title="Rectangle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_rectangle"></use></svg></li>
+            
             <li id="region_shape_circle" onclick="select_region_shape('circle')" title="Circle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_circle"></use></svg></li>
+            
             <li id="region_shape_ellipse" onclick="select_region_shape('ellipse')" title="Ellipse"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_ellipse"></use></svg></li>
+            
             <li id="region_shape_polygon" onclick="select_region_shape('polygon')" title="Polygon"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_polygon"></use></svg></li>
+            
             <li id="region_shape_point" onclick="select_region_shape('point')" title="Point"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_point"></use></svg></li>
+
           </ul>
         </div>
 
@@ -687,9 +694,39 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
     <script type="text/javascript" src="scripts.js"></script>
     <script type="text/javascript">
       _init({
-        id: "legend" ,
-        labels: {text: '#66ff99',graphic: '#ff0000', equation: '#0000ff', title: '#ffff00', table: '#ffff00' }
+        region_div: "legend" ,
+        region: [
+          {
+            region_id: 1,
+            region_name: "text",
+            region_color: '#66ff99',
+            region_description: 'text content',
+            region_attributes: [ {att_name: "language", att_type: true } ]
+          },
+          {
+            region_id: 2,
+            region_name: "graphic",
+            region_color: '#ff0000',
+            region_description: 'graphic content',
+            region_attributes: []
+          },
+          {
+            region_id: 3,
+            region_name: "equation",
+            region_color: '#0000ff',
+            region_description: 'Maths equations',
+            region_attributes: [ ]
+          },
+          {
+            region_id: 4,
+            region_name: "table",
+            region_color: '#ffff00',
+            region_description: 'Table content',
+            region_attributes: [ ]
+          }
+        ]
       });
+      
     </script>
   </body>
 </html>
