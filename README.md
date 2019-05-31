@@ -12,17 +12,17 @@ The _init() function requires a JavaScript object as an input argument.
 The object has two properties 'region_div' and 'region'.
 region_div denotes the id of the container.
 ```sh
-region_div: "*<id>*"
+region_div: "<id>"
 ```
 region is an array of objects. Each object should represent a region along with other properties.
 ```sh
 region: [
           {
-            region_id: *<region id>*,
-            region_name: "*<name of the region>*",
-            region_color: '*<color associated with the region>*',
-            region_description: '*<Description of the region>*',
-            region_attributes: [ {att_name: "*<name of the attribute>*", att_type: *<boolean>* } ]
+            region_id: <region id>,
+            region_name: "<name of the region>",
+            region_color: '<color associated with the region>',
+            region_description: '<Description of the region>',
+            region_attributes: [ {att_name: "<name of the attribute>", att_type: <boolean> } ]
           }];
 ```
 region_attributes is an array of attribute objects.
