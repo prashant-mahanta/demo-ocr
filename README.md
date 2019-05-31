@@ -2,4 +2,4 @@
 labs
 
 ## _init()
-Initialises the scripts.js file. Requires a JavaScript object as the input. 
+Initialises the **scripts.js** file. Requires a JavaScript object as the input. 
