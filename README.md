@@ -9,21 +9,22 @@ Copy this file to your working directory. The **scripts.js** can be initialized 
 ![Initializing Script](https://github.com/n-ambati/demo-ocr/blob/master/ocr/Screenshot%202019-05-31%20at%202.55.10%20PM.png)
 
 The _init() function requires a JavaScript object as an input argument.
-The object should contain an 'id' of the container allocated for rendering the regions as the value of the property
-**region_div**.
+The object has two properties 'region_div' and 'region'.
+region_div denotes the id of the container.
 ```sh
-region_div: "<id>"
+region_div: "*<id>*"
 ```
-
-Include the information like name of the region, the color to be assigned for it, the description and the attributes
-of the region
+region is an array of objects. Each object should represent a region along with other properties.
 ```sh
 region: [
           {
-            region_id: 1,
-            region_name: "text",
-            region_color: '#66ff99',
-            region_description: 'text content',
-            region_attributes: [ {att_name: "language", att_type: true } ]
+            region_id: *<region id>*,
+            region_name: "*<name of the region>*",
+            region_color: '*<color associated with the region>*',
+            region_description: '*<Description of the region>*',
+            region_attributes: [ {att_name: "*<name of the attribute>*", att_type: *<boolean>* } ]
           }];
 ```
+region_attributes is an array of attribute objects.
+The att_type: true defines that the attribute is mandatory and 
+att_type: false defines the attribute as optional.
