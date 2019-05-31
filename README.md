@@ -13,4 +13,17 @@ The object should contain an 'id' of the container allocated for rendering the r
 **region_div**.
 ```sh
 region_div: "<id>"
-'''
+```
+
+Include the information like name of the region, the color to be assigned for it, the description and the attributes
+of the region
+```sh
+region: [
+          {
+            region_id: 1,
+            region_name: "text",
+            region_color: '#66ff99',
+            region_description: 'text content',
+            region_attributes: [ {att_name: "language", att_type: true } ]
+          }];
+```
