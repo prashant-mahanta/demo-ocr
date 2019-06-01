@@ -595,18 +595,22 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
     <!-- Middle Panel contains a left-sidebar and image display areas -->
     <div class="middle_panel">
       <div id="leftsidebar">
-        <button onclick="toggle_accordion_panel(this)" class="leftsidebar_accordion active">Region Shape</button>
-        <div class="leftsidebar_accordion_panel show" id="accordion_region_shape_panel">
-          <ul class="region_shape">
-            <li id="region_shape_rect" class="selected" onclick="select_region_shape('rect')" title="Rectangle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_rectangle"></use></svg></li>
+        <button onclick="toggle_region_shape_list(this)" id= "region_shapes" class="leftsidebar_accordion active">Region Shape</button>
+        <div class="leftsidebar_accordion_panel show" >
+          <ul class="region_shape" id="accordion_region_shape_panel">
+            <!-- <li id="region_shape_rect" class="selected" onclick="select_region_shape('rect')" title="Rectangle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_rectangle"></use></svg></li> -->
             
-            <li id="region_shape_circle" onclick="select_region_shape('circle')" title="Circle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_circle"></use></svg></li>
+            
+            <!-- 
+              <li id="region_shape_point" onclick="select_region_shape('point')" title="Point"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_point"></use></svg></li>
             
             <li id="region_shape_ellipse" onclick="select_region_shape('ellipse')" title="Ellipse"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_ellipse"></use></svg></li>
+            -->
+            <!-- <li id="region_shape_polygon" onclick="select_region_shape('polygon')" title="Polygon"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_polygon"></use></svg></li> -->
+             
             
-            <li id="region_shape_polygon" onclick="select_region_shape('polygon')" title="Polygon"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_polygon"></use></svg></li>
-            
-            <li id="region_shape_point" onclick="select_region_shape('point')" title="Point"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_point"></use></svg></li>
+          
+            <!-- <li id="region_shape_circle" onclick="select_region_shape('circle')" title="Circle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_circle"></use></svg></li> -->
 
           </ul>
         </div>
@@ -724,6 +728,30 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
             region_description: 'Table content',
             region_attributes: [ ]
           }
+        ],
+        shape_id: "accordion_region_shape_panel",
+        shapes: [
+          {
+            name: 'rectangle',
+            code: 'rect',
+            region_shape: 'RECT'
+          },
+          {
+            name: 'circle',
+            code: 'circle',
+            region_shape: 'CIRCLE'
+          },
+          {
+            name: 'polygon',
+            code: 'polygon',
+            region_shape: 'POLYGON'
+          },
+          {
+            name: 'ellipse',
+            code: 'ellipse',
+            region_shape: 'ELLIPSE'
+          },
+
         ]
       });
       

@@ -89,8 +89,11 @@ var _cur_region_id               = 0;
 var _cur_reg_drawing_id          = -1;
 var nested_region_id             = -1;
 
+var _is_region_shape_list_visible = true;
+var region_shape_list = document.getElementById("accordion_region_shape_panel");
+
 // region
-var _current_shape             = _REGION_SHAPE.RECT;
+var _current_shape    ;//         = _REGION_SHAPE.RECT;
 var _current_polygon_region_id = -1;
 var _user_sel_region_id        = -1;
 var _click_x0 = 0; var _click_y0 = 0;
@@ -211,16 +214,56 @@ function populate_region_list(legendList, label_id) {
   //       });
 }
 
+function populate_shape_list(shapes, shape_id) {
+    var container = document.getElementById(shape_id);
+    var c = 0
+    for (var key in shapes) {
+      //populating legend with colors
+
+        _REGION_SHAPE[ shapes[key]["region_shape"] ] = shapes[key]["code"];
+
+        
+
+
+        var boxContainer = document.createElement("li");
+        boxContainer.setAttribute('title', shapes[key]["name"]);
+        boxContainer.setAttribute('id', 'region_shape_' + shapes[key]["code"]);
+        boxContainer.setAttribute('onclick', "select_region_shape('" + shapes[key]["code"] + "')");
+        // boxContainer.setAttribute('style', 'height=20; width=20');
+        if ( c == 0 ){
+          _current_shape = _REGION_SHAPE[shapes[key]["region_shape"]];
+          boxContainer.setAttribute('class', 'selected');
+        }
+        c++;
+        var box = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        box.setAttribute('height', '32');
+        box.setAttribute('viewbox', '0 0 32 32');
+        // box.setAttribute("x", "10");
+        // var box_inside = document.createElement("use");
+        // box_inside.setAttribute('xlink:href', '#shape_'+shapes[key]["name"]);
+
+        var useSVG = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        useSVG.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href', '#shape_'+shapes[key]["name"]);
+        // useSVG.setAttributeNS(null, 'height', '50');
+        // useSVG.setAttributeNS(null, 'width', '50');
+        // useSVG.setAttribute("y", "10");
+        // var shape = "<svg height='32' viewbox='0 0 32 32'><use xlink:href='#shape_"+shapes[key]["name"]+"'></use></svg>";
+        box.appendChild(useSVG);
+        boxContainer.appendChild(box);
+        // boxContainer.appendChild(box);
+        // boxContainer.appendChild(label);
+        container.appendChild(boxContainer);
+
+   }
+   
+}
+
 //
 // Initialization routine
 //
 
 function set_variables(){
-   _REGION_SHAPE = { RECT:'rect',
-                         CIRCLE:'circle',
-                         ELLIPSE:'ellipse',
-                         POLYGON:'polygon',
-                         POINT:'point'};
+ _REGION_SHAPE = {};
 
  _ZONE_TYPE = { TEXT:'text',
                          GRAPHIC:'graphic',
@@ -305,8 +348,10 @@ function set_variables(){
  _cur_reg_drawing_id          = -1;
  nested_region_id             = -1;
 
+ _is_region_shape_list_visible = true;
+ region_shape_list = document.getElementById("accordion_region_shape_panel");
 // region
- _current_shape             = _REGION_SHAPE.RECT;
+ _current_shape     ;//        = _REGION_SHAPE.RECT;
  _current_polygon_region_id = -1;
  _user_sel_region_id        = -1;
  _click_x0 = 0;  _click_y0 = 0;
@@ -367,14 +412,16 @@ function _init(event) {
   label_id = event["region_div"];
   show_home_panel();
   var labels = event["region"];
-  
+  var shapes = event["shapes"];
+  var shape_id = event["shape_id"];
+
   for (var i = 0; i < labels.length; i++) {
     legendList[ labels[i]["region_name"] ] = labels[i]["region_color"];
     legendListDesc[ labels[i]["region_name"] ] = labels[i]["region_description"];
   }
   // console.log(legendList);
   populate_region_list(legendList, label_id);
-
+  populate_shape_list(shapes, shape_id);
   _is_local_storage_available = check_local_storage();
   if (_is_local_storage_available) {
     if (is_data_in_localStorage()) {
@@ -1055,6 +1102,7 @@ function _load_canvas_regions() {
 
 // updates currently selected region shape
 function select_region_shape(sel_shape_name) {
+  console.log(sel_shape_name);
   for ( var shape_name in _REGION_SHAPE ) {
     var ui_element = document.getElementById('region_shape_' + _REGION_SHAPE[shape_name]);
     ui_element.classList.remove('selected');
@@ -1088,6 +1136,7 @@ console.log("switch");
     show_message('Unknown shape selected!');
     break;
   }
+  console.log("selected");
 }
 
 function set_all_canvas_size(w, h) {
@@ -1128,6 +1177,25 @@ function toggle_img_list(panel) {
     _is_loaded_img_list_visible = true;
     show_img_list();
   }
+}
+
+function toggle_region_shape_list(panel) {
+
+  if ( typeof panel === 'undefined' ) {
+    // invoked from accordion in the top navigation toolbar
+    panel = document.getElementById('region_shapes');
+  }
+  panel.classList.toggle('active');
+ 
+  if (_is_region_shape_list_visible) {
+    region_shape_list.style.display    = 'none';
+    _is_region_shape_list_visible = false;
+  } else {
+    region_shape_list.style.display    = 'block';
+    _is_region_shape_list_visible = true;
+    // show_img_list();
+  }
+
 }
 
 function show_img_list() {
@@ -1279,6 +1347,13 @@ function show_annotation_data() {
   annotation_data_window.document.body.innerHTML = hstr;
 }
 
+
+function show_modal_for_attribute(){
+
+}
+
+
+
 //
 // Image click handlers
 //
@@ -1428,19 +1503,28 @@ _reg_canvas.addEventListener('mouseup', function(e) {
         _is_user_moving_region = false;
 
         _current_type = _img_metadata[_image_id].regions[_user_sel_region_id].shape_attributes.type;
-        switch(_current_type){
-        case 'text':
-          _THEME_SEL_REGION_FILL_COLOR = '#66ff99';
+        
+
+      //   switch(_current_type){
+      //   case 'text':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#66ff99';
+      //     break;
+      //   case 'graphic':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#ff0000';
+      //     break;
+      //   case 'equation':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#0000ff';
+      //     break;
+      //   case 'title':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#ffff00';
+      //     break;
+      // }
+
+      for (var key in legendList){
+        if( _current_type === key){
+          _THEME_SEL_REGION_FILL_COLOR = legendList[key];
           break;
-        case 'graphic':
-          _THEME_SEL_REGION_FILL_COLOR = '#ff0000';
-          break;
-        case 'equation':
-          _THEME_SEL_REGION_FILL_COLOR = '#0000ff';
-          break;
-        case 'title':
-          _THEME_SEL_REGION_FILL_COLOR = '#ffff00';
-          break;
+        }
       }
 
         // de-select all other regions if the user has not pressed Shift
@@ -1661,19 +1745,26 @@ _reg_canvas.addEventListener('mouseup', function(e) {
       _current_type = _img_metadata[_image_id].regions[_user_sel_region_id].shape_attributes.type;
       }
       //console.log(_current_type);
-      switch(_current_type){
-        case 'text':
-          _THEME_SEL_REGION_FILL_COLOR = '#66ff99';
+      // switch(_current_type){
+      //   case 'text':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#66ff99';
+      //     break;
+      //   case 'graphic':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#ff0000';
+      //     break;
+      //   case 'equation':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#0000ff';
+      //     break;
+      //   case 'title':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#ffff00';
+      //     break;
+      // }
+
+      for (var key in legendList){
+        if( _current_type === key){
+          _THEME_SEL_REGION_FILL_COLOR = legendList[key];
           break;
-        case 'graphic':
-          _THEME_SEL_REGION_FILL_COLOR = '#ff0000';
-          break;
-        case 'equation':
-          _THEME_SEL_REGION_FILL_COLOR = '#0000ff';
-          break;
-        case 'title':
-          _THEME_SEL_REGION_FILL_COLOR = '#ffff00';
-          break;
+        }
       }
 
         // de-select all other regions if the user has not pressed Shift
@@ -1838,9 +1929,14 @@ _reg_canvas.addEventListener('mouseup', function(e) {
           // handled by _is_user_drawing polygon
           break;
         }
-    } else {
+
+        show_modal_for_attribute();
+    }
+     else {
       show_message('Cannot add such a small region');
     }
+
+    
     update_attributes_panel();
     _redraw_reg_canvas();
     _reg_canvas.focus();
@@ -3796,30 +3892,30 @@ function add_new_attribute(type, attribute_name) {
 
 function display_add_region_popup() {
   // Get the modal
-var modal = document.getElementById('myModal');
+  var modal = document.getElementById('myModal');
 
-// // Get the button that opens the modal
-// var btn = document.getElementById("myBtn");
+  // // Get the button that opens the modal
+  // var btn = document.getElementById("myBtn");
 
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
 
-// When the user clicks on the button, open the modal 
-// btn.onclick = function() {
-  modal.style.display = "block";
-// }
+  // When the user clicks on the button, open the modal 
+  // btn.onclick = function() {
+    modal.style.display = "block";
+  // }
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
     modal.style.display = "none";
   }
-}
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
 }
 
 function validateFormOnSubmit(data){
@@ -3838,4 +3934,8 @@ function validateFormOnSubmit(data){
     var modal = document.getElementById('myModal');
     modal.style.display = "none";
   }
+
+  region_name.value = "";
+  region_color.value = "";
+  region_description.value = "";
 }
