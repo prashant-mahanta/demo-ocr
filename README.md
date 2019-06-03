@@ -44,3 +44,27 @@ region: [
           .
           .]
 ```
+
+The *shape_id* property takes in the id of the container specified for rendering shapes.
+```sh
+shape_id: "<id>"
+```
+
+*shapes* is similar to *region* property, an array of objects, with each object defining a shape to be rendered.
+```sh
+shapes: [
+          {
+            name: 'rectangle',
+            code: 'rect',
+            region_shape: 'RECT'
+          },
+          {
+            name: 'circle',
+            code: 'circle',
+            region_shape: 'CIRCLE'
+          },
+          .
+          .
+          .]
+```
+
