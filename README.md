@@ -26,5 +26,4 @@ region: [
           }];
 ```
 region_attributes is an array of attribute objects.     
-The att_type: true defines that the attribute is mandatory and     
-att_type: false defines the attribute as optional.           
+The *att_type: true* defines that the attribute is mandatory and *att_type: false* defines the attribute as optional.           
