@@ -8,7 +8,7 @@ Include the *scripts.js* file into your code.
  The *scripts.js* file can be initialized using *_init()* function. It requires a javascript object as an input.
  ```HTML
  <script type="text/javascript">
-     _init(<javascript object>)
+     _init(javascript object)
  </script>
  ```
  
@@ -20,25 +20,25 @@ Include the *scripts.js* file into your code.
 
 The *region_div* property carries the id of the container for rendering regions.
 ```Javascript
-region_div: "<container id>"
+region_div: "container id"
 ```
 
 The *region* is an array of objects, each object specifying a region.
 ```Javascript
 region: [
           {
-            region_id: <id>,
-            region_name: "<Name of the region>",
-            region_color: '<Color>',
-            region_description: '<Description>',
-            region_attributes: [<array of attribute objects>]
+            region_id: id,
+            region_name: "Name of the region",
+            region_color: 'Color',
+            region_description: 'Description',
+            region_attributes: [array of attribute objects]
           },
           {
-            region_id: <id>,
-            region_name: "<Name of the region>",
-            region_color: '<Color>',
-            region_description: '<Description>',
-            region_attributes: [<array of attribute objects>]
+            region_id: id,
+            region_name: "Name of the region",
+            region_color: 'Color',
+            region_description: 'Description',
+            region_attributes: [array of attribute objects]
           },
           .
           .
@@ -47,7 +47,7 @@ region: [
 
 The *shape_id* property takes in the id of the container specified for rendering shapes.
 ```Javascript
-shape_id: "<id>"
+shape_id: "id"
 ```
 
 *shapes* is similar to *region* property, an array of objects, with each object defining a shape to be rendered.
