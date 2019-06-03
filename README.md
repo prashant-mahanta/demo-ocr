@@ -14,7 +14,7 @@ region_div denotes the id of the container.
 ```sh
 region_div: "<id>"
 ```
-region is an array of objects. Each object should represent a region along with other properties.
+region is an array of objects. Each object should represent a region along with it's properties.
 ```sh
 region: [
           {
