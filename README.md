@@ -17,3 +17,30 @@ Include the *scripts.js* file into your code.
  * *region*
  * *shape_id*
  * *shapes*
+
+The *region_div* property carries the id of the container for rendering regions.
+```sh
+region_div: "<container id>"
+```
+
+The *region* is an array of objects, each object specifying a region.
+```sh
+region: [
+          {
+            region_id: <id>,
+            region_name: "<Name of the region>",
+            region_color: '<Color>',
+            region_description: '<Description>',
+            region_attributes: [<array of attribute objects>]
+          },
+          {
+            region_id: <id>,
+            region_name: "<Name of the region>",
+            region_color: '<Color>',
+            region_description: '<Description>',
+            region_attributes: [<array of attribute objects>]
+          },
+          .
+          .
+          .]
+```
