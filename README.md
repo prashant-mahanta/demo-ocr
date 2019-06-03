@@ -1,12 +1,12 @@
 # Demo-OCR
 
 Include the *scripts.js* file into your code.
-```sh
+```HTML
 <script type="text/javascript" src="https://github.com/prashant-mahanta/demo-ocr/blob/master/scripts.js"></script>
 ```
  
  The *scripts.js* file can be initialized using *_init()* function. It requires a javascript object as an input.
- ```sh
+ ```HTML
  <script type="text/javascript">
      _init(<javascript object>)
  </script>
@@ -19,12 +19,12 @@ Include the *scripts.js* file into your code.
  * *shapes*
 
 The *region_div* property carries the id of the container for rendering regions.
-```sh
+```Javascript
 region_div: "<container id>"
 ```
 
 The *region* is an array of objects, each object specifying a region.
-```sh
+```Javascript
 region: [
           {
             region_id: <id>,
@@ -46,12 +46,12 @@ region: [
 ```
 
 The *shape_id* property takes in the id of the container specified for rendering shapes.
-```sh
+```Javascript
 shape_id: "<id>"
 ```
 
 *shapes* is similar to *region* property, an array of objects, with each object defining a shape to be rendered.
-```sh
+```Javascript
 shapes: [
           {
             name: 'rectangle',
