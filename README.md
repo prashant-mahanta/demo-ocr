@@ -1,6 +1,6 @@
 # Demo-OCR
 
-Include the *scripts.js* file into your code.
+Include the *scripts.js* file into your HTML file.
 ```HTML
 <script type="text/javascript" src="https://github.com/prashant-mahanta/demo-ocr/blob/master/scripts.js"></script>
 ```
