@@ -127,7 +127,7 @@ var _loaded_img_table_html = [];
 
 //Legend to identify types of B.box
 var legendList = {};
-
+var legendListAttribute = {};
 
 // UI html elements
 var invisible_file_input = document.getElementById("invisible_file_input");
@@ -221,9 +221,6 @@ function populate_shape_list(shapes, shape_id) {
       //populating legend with colors
 
         _REGION_SHAPE[ shapes[key]["region_shape"] ] = shapes[key]["code"];
-
-        
-
 
         var boxContainer = document.createElement("li");
         boxContainer.setAttribute('title', shapes[key]["name"]);
@@ -386,6 +383,7 @@ function set_variables(){
 //Legend to identify types of B.box
  legendList = {};
  legendListDesc = {};
+ legendListAttribute = {};
 
 // UI html elements
  invisible_file_input = document.getElementById("invisible_file_input");
@@ -418,6 +416,7 @@ function _init(event) {
   for (var i = 0; i < labels.length; i++) {
     legendList[ labels[i]["region_name"] ] = labels[i]["region_color"];
     legendListDesc[ labels[i]["region_name"] ] = labels[i]["region_description"];
+    legendListAttribute[ labels[i]["region_name"]] = labels[i]["region_attributes"]
   }
   // console.log(legendList);
   populate_region_list(legendList, label_id);
@@ -1349,7 +1348,7 @@ function show_annotation_data() {
 
 
 function show_modal_for_attribute(){
-
+  window.alert("Hi new region");
 }
 
 
