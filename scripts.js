@@ -180,7 +180,7 @@ function populate_region_list(legendList, label_id) {
 
     container.innerHTML = "";
     dropdown_container.innerHTML = "";
-  
+
     for (var key in legendList) {
       //populating legend with colors
         var boxContainer = document.createElement("DIV");
@@ -196,12 +196,15 @@ function populate_region_list(legendList, label_id) {
         container.appendChild(boxContainer);
 
 
-      //populating 'Change Region' dropdown 
+      //populating 'Change Region' dropdown
         var dropdown_item = document.createElement("a");
         // dropdown_item.onclick = function(key) { return function () {change_region(key)};}
         let new_key = key
-        dropdown_item.addEventListener('click', function (event) {
+        dropdown_item.addEventListener('click', function (e) {
           change_region(new_key);
+          if(!_is_reg_attr_panel_visible) {
+              toggle_reg_attr_panel();
+          }
          }, false);
         dropdown_item.innerHTML = key
         dropdown_container.appendChild(dropdown_item);
@@ -254,7 +257,7 @@ function populate_shape_list(shapes, shape_id) {
         container.appendChild(boxContainer);
 
    }
-   
+
 }
 
 //
@@ -1188,7 +1191,7 @@ function toggle_region_shape_list(panel) {
     panel = document.getElementById('region_shapes');
   }
   panel.classList.toggle('active');
- 
+
   if (_is_region_shape_list_visible) {
     region_shape_list.style.display    = 'none';
     _is_region_shape_list_visible = false;
@@ -1505,7 +1508,7 @@ _reg_canvas.addEventListener('mouseup', function(e) {
         _is_user_moving_region = false;
 
         _current_type = _img_metadata[_image_id].regions[_user_sel_region_id].shape_attributes.type;
-        
+
 
       //   switch(_current_type){
       //   case 'text':
@@ -1938,7 +1941,7 @@ _reg_canvas.addEventListener('mouseup', function(e) {
       show_message('Cannot add such a small region');
     }
 
-    
+
     update_attributes_panel();
     _redraw_reg_canvas();
     _reg_canvas.focus();
@@ -3677,7 +3680,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
   //   ' onblur="_is_user_adding_attribute_name=false; this.value = \'\';"' +
   //   ' onfocus="_is_user_adding_attribute_name=true; this.value = \'\';" />';
 
-  
+
 
   var sel_rows = [];
   // for ( var i=0; i < sel_reg_list.length; ++i ) {
@@ -3700,7 +3703,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
     region_id_cell.style.fontWeight = 'bold';
     region_id_cell.style.width      = '2em';
 
-    
+
 
     if (data[row_i].is_user_selected) {
       region_id_cell.style.backgroundColor = '#5599FF';
@@ -3749,7 +3752,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
           //     ' onblur="attr_input_blur(' + row_i + ')"' +
           //     ' onfocus="attr_input_focus(' + row_i + ');"' +
           //     ' >' + ip_val + '</textarea>';
-          // } 
+          // }
           // else {
             // row.insertCell(-1).innerHTML = '<input type="text"' +
             //   ' id="' +   input_id + '"' +
@@ -4106,7 +4109,7 @@ function display_add_region_popup() {
   // Get the <span> element that closes the modal
   var span = document.getElementsByClassName("close")[0];
 
-  // When the user clicks on the button, open the modal 
+  // When the user clicks on the button, open the modal
   // btn.onclick = function() {
     modal.style.display = "block";
   // }
