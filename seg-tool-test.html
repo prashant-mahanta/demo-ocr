@@ -541,7 +541,7 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
               <a onclick="change_region_title()" title="Change Region type to Title">Title</a> -->
             </div>
           </li>
-          <li><a onclick="display_add_region_popup()" title="New Region">New Region</a></li>
+          <li><a title="New Region">New Region</a></li>
           <!-- The Modal -->
 <div id="myModal" class="modal">
 
@@ -683,7 +683,7 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
     <!-- region and file attributes input panel -->
     <div id="attributes_panel">
       <div id="attributes_panel_toolbar">
-        <div onclick="toggle_attributes_input_panel()" class="attributes_panel_button">&times;</div>
+        <!-- <div onclick="toggle_attributes_input_panel()" class="attributes_panel_button">&times;</div> -->
       </div>
       <table id="attributes_panel_table"></table>
     </div>
@@ -698,6 +698,8 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
     <script type="text/javascript" src="scripts.js"></script>
     <script type="text/javascript">
       _init({
+        canvas_id: "image_canvas",
+        region_canvas_id: "region_canvas",
         region_div: "legend" ,
         region: [
           {

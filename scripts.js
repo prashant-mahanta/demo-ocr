@@ -411,7 +411,37 @@ function set_variables(){
  BBOX_BOUNDARY_LINE_COLOR           = "#1a1a1a";
  BBOX_SELECTED_FILL_COLOR           = "#ffffff";
 }
+
+function init_canvas(canvas_id, region_canvas_id){
+  // image canvas
+ _img_canvas = document.getElementById(canvas_id);
+ _img_ctx    = _img_canvas.getContext("2d");
+ _reg_canvas = document.getElementById(region_canvas_id);
+ _reg_ctx    = _reg_canvas.getContext("2d");
+ _canvas_width, _canvas_height;
+}
+
+function populate_attribute_position(attribute_id){
+
+  // <div onclick="toggle_attributes_input_panel()" class="attributes_panel_button">&times;</div>
+  var body = document.getElementById(attribute_id);
+  var boxContainer = document.createElement("div");
+  boxContainer.setAttribute("onclick", "toggle_attributes_input_panel()");
+  boxContainer.setAttribute("style", "width: 10px;color: black;font-size: x-large;margin-left: 0.5em;padding: 0;");
+  boxContainer.innerHTML = "&times;";
+  var center = document.createElement("center");
+  var warn = document.createElement("span");
+  warn.setAttribute("style", "color: red; font-size:18px; float: center;");
+  warn.innerHTML = "&#42; Required";
+  body.appendChild(boxContainer);
+  center.appendChild(warn);
+  body.appendChild(center);
+  
+}
+
+
 function _init(event) {
+  init_canvas(event["canvas_id"], event["region_canvas_id"]);
   set_variables();
   label_id = event["region_div"];
   show_home_panel();
@@ -427,6 +457,9 @@ function _init(event) {
   // console.log(legendList);
   populate_region_list(legendList, label_id);
   populate_shape_list(shapes, shape_id);
+  populate_attribute_position("attributes_panel_toolbar");
+
+
   _is_local_storage_available = check_local_storage();
   if (_is_local_storage_available) {
     if (is_data_in_localStorage()) {
@@ -3651,7 +3684,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
     } else {
       region_traversal_order = all_reg_list;
     }
-  }
+  
 
 
   var attrtable = document.createElement('table');
@@ -3663,12 +3696,19 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
   topleft_cell.innerHTML = '';
   topleft_cell.style.border = 'none';
 
-
+  console.log("data---");
+  console.log(data);
+  console.log(type);
+  console.log(sel_reg_list);
+  console.log("----");
   for (var col_header in _region_attributes ) {
     if(col_header == data[sel_reg_list[0]].shape_attributes.type){
       for (var col in _region_attributes [col_header]){
         // col_headers.push(_region_attributes [col_header][col])
-              firstrow.insertCell(-1).innerHTML = '<b>' + _region_attributes [col_header][col].att_name + '</b>';
+        var mark = "";
+        if( _region_attributes [col_header][col].att_type)
+            mark = "<sup style='color: red; font-size:18px'>&#42;<sup>";
+              firstrow.insertCell(-1).innerHTML = '<b>' + _region_attributes [col_header][col].att_name + mark  + '</b>';
       }
     }
   }
@@ -3736,32 +3776,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
                   ' onfocus="attr_input_focus(' + row_i + ');" />';
             }
           }
-          // console.log("input banao" + ip_val);
-          // escape all single and double quotes
-          // ip_val = ip_val.replace(/'/g, '\'');
-          // ip_val = ip_val.replace(/"/g, '&quot;');
-
-
-          // if ( ip_val.length > 30 ) {
-          //   row.insertCell(-1).innerHTML = '<textarea ' +
-          //     ' rows="' + (Math.floor(ip_val.length/30)-1) + '"' +
-          //     ' cols="30"' +
-          //     ' id="' +   input_id + '"' +
-          //     ' autocomplete="on"' +
-          //     ' onchange="update_attribute_value(\'' + input_id + '\', this.value)"' +
-          //     ' onblur="attr_input_blur(' + row_i + ')"' +
-          //     ' onfocus="attr_input_focus(' + row_i + ');"' +
-          //     ' >' + ip_val + '</textarea>';
-          // }
-          // else {
-            // row.insertCell(-1).innerHTML = '<input type="text"' +
-            //   ' id="' +   input_id + '"' +
-            //   ' value="' + ip_val + '"' +
-            //   ' autocomplete="on"' +
-            //   ' onchange="update_attribute_value(\'' + input_id + '\', this.value)"' +
-            //   ' onblur="attr_input_blur(' + row_i + ')"' +
-            //   ' onfocus="attr_input_focus(' + row_i + ');" />';
-          // }
+          
         }
       else{
       if ( key == data[sel_reg_list[0]].shape_attributes.type ) {
@@ -3793,7 +3808,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
     attributes_panel.scrollTop = 0;
   }
 }
-
+}
 
 
 // function init_spreadsheet_input(type, col_headers, data, row_names) {
@@ -3985,8 +4000,8 @@ function toggle_attributes_input_panel() {
 
 function toggle_reg_attr_panel() {
   if ( _current_image_loaded ) {
-    var panel = document.getElementById('reg_attr_panel_button');
-    panel.classList.toggle('active');
+    // var panel = document.getElementById('reg_attr_panel_button');
+    // panel.classList.toggle('active');
     if ( _is_attributes_panel_visible ) {
       if( _is_reg_attr_panel_visible ) {
         attributes_panel.style.display   = 'none';
@@ -3994,21 +4009,22 @@ function toggle_reg_attr_panel() {
         _is_reg_attr_panel_visible   = false;
         _reg_canvas.focus();
         // add horizontal spacer to allow scrollbar
-        var hs = document.getElementById('horizontal_space');
-        hs.style.height = attributes_panel.offsetHeight+'px';
+        // var hs = document.getElementById('horizontal_space');
+        // hs.style.height = attributes_panel.offsetHeight+'px';
 
       } else {
         update_region_attributes_input_panel();
         _is_reg_attr_panel_visible  = true;
         _is_file_attr_panel_visible = false;
         // de-activate the file-attr accordion panel
-        var panel = document.getElementById('file_attr_panel_button');
-        panel.classList.toggle('active');
+        // var panel = document.getElementById('file_attr_panel_button');
+        // panel.classList.toggle('active');
         attributes_panel.focus();
       }
     } else {
-      _is_attributes_panel_visible = true;
+     
       update_region_attributes_input_panel();
+       _is_attributes_panel_visible = true;
       _is_reg_attr_panel_visible = true;
       attributes_panel.style.display = 'block';
       attributes_panel.focus();
