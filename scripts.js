@@ -40,6 +40,7 @@ var _CSV_KEYVAL_SEP = ':';
 var _IMPORT_CSV_COMMENT_CHAR = '#';
 
 var _img_metadata = {};   // data structure to store loaded images metadata
+var _img_region_id = 1;
 var _img_count    = 0;    // count of the loaded images
 var _canvas_regions = []; // image regions spec. in canvas space
 var _canvas_scale   = 1.0;// current scale of canvas image
@@ -171,6 +172,9 @@ function ImageRegion() {
   this.is_user_selected  = false;
   this.shape_attributes  = {}; // region shape attributes
   this.region_attributes = {}; // region attributes
+  this.image_region_id = _img_region_id;
+  console.log("image region id: " + _img_region_id);
+  _img_region_id++;
 }
 
 function populate_region_list(legendList, label_id) {
@@ -301,6 +305,7 @@ function set_variables(){
  _IMPORT_CSV_COMMENT_CHAR = '#';
 
  _img_metadata = {};   // data structure to store loaded images metadata
+ _img_region_id = 1;   // image id
  _img_count    = 0;    // count of the loaded images
  _canvas_regions = []; // image regions spec. in canvas space
  _canvas_scale   = 1.0;// current scale of canvas image
@@ -3696,11 +3701,11 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
   topleft_cell.innerHTML = '';
   topleft_cell.style.border = 'none';
 
-  console.log("data---");
-  console.log(data);
-  console.log(type);
-  console.log(sel_reg_list);
-  console.log("----");
+  // console.log("data---");
+  // console.log(data);
+  // console.log(type);
+  // console.log(sel_reg_list);
+  // console.log("----");
   for (var col_header in _region_attributes ) {
     if(col_header == data[sel_reg_list[0]].shape_attributes.type){
       for (var col in _region_attributes [col_header]){
@@ -3732,7 +3737,8 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
       if ( sel_reg_list.length ) {
         row_i = region_traversal_order[row_i];
       }
-      di = data[row_i].region_attributes;
+      di = {}
+      di[data[row_i].shape_attributes.type] = "";
     } else {
       di = data[row_i];
     }
@@ -3756,22 +3762,22 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
     // console.log("-------");
 
     for ( var key in col_headers ) {
-      var input_id = type[0] + '#' + key + '#' + row_i;
+      var input_id = type[0] + '#' + key + '#' + _img_metadata[_image_id].regions[row_i].image_region_id;
           if ( di.hasOwnProperty(key) ){
-          var ip_val = di[key];
+          // var ip_val = di[key];
           for (var col in _region_attributes [key]){
             if(attributes_values.hasOwnProperty(input_id+'#'+col)){
                 row.insertCell(-1).innerHTML = '<input type="text"' +
                 ' id="' + input_id + '#'+ col + '"' +
                 ' value="' + attributes_values[input_id+'#'+col] + '"' +
-                ' onchange="update_attribute_value(\'' + input_id + '#' + col + '\', this.value)" ' +
+                ' onchange="update_attribute_value(\'' + input_id + '#' + col + '\', \'' + _region_attributes[key][col].att_name + '\', \'' + row_i + '\', this.value)" ' +
                 ' onblur="attr_input_blur(' + row_i + ')"' +
                 ' onfocus="attr_input_focus(' + row_i + ');" />';
             }
             else{
                   row.insertCell(-1).innerHTML = '<input type="text"' +
                   ' id="' + input_id + '#'+ col + '"' +
-                  ' onchange="update_attribute_value(\'' + input_id + '#' + col + '\', this.value)" ' +
+                  ' onchange="update_attribute_value(\'' + input_id + '#' + col + '\', \'' + _region_attributes[key][col].att_name + '\', \'' + row_i + '\', this.value)" ' +
                   ' onblur="attr_input_blur(' + row_i + ')"' +
                   ' onfocus="attr_input_focus(' + row_i + ');" />';
             }
@@ -3783,8 +3789,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
         for (var col in _region_attributes [key]){
           row.insertCell(-1).innerHTML = '<input type="text"' +
           ' id="' + input_id + '#'+ col + '"' +
-          ' onchange="update_attribute_value(\'' + input_id + '#' + col + '\', this.value)" ' +
-          ' onblur="attr_input_blur(' + row_i + ')"' +
+          ' onchange="update_attribute_value(\'' + input_id + '#' + col + '\', \'' + _region_attributes[key][col].att_name + '\', \'' + row_i + '\', this.value)" ' +          ' onblur="attr_input_blur(' + row_i + ')"' +
           ' onfocus="attr_input_focus(' + row_i + ');" />';
         }
       }
@@ -3989,8 +3994,19 @@ function update_file_attributes_input_panel() {
                          [_current_image_filename]);
 }
 
+
+function required_attributes_filled(){
+  var seg_rel_list = [];
+  for (var i in _img_metadata[_image_id].regions){
+    if ( _img_metadata[_image_id].regions[i].is_user_selected ){
+      seg_rel_list.push(i);
+    }
+  }
+
+}
+
 function toggle_attributes_input_panel() {
-  if( _is_reg_attr_panel_visible ) {
+  if( _is_reg_attr_panel_visible ) { // && required_attributes_filled()
     toggle_reg_attr_panel();
   }
   if( _is_file_attr_panel_visible ) {
@@ -4070,11 +4086,11 @@ function update_vertical_space() {
   panel.style.height = attributes_panel.offsetHeight+'px';
 }
 
-function update_attribute_value(attr_id, value) {
+function update_attribute_value(attr_id, att_name, regionId, value) {
   var attr_id_split = attr_id.split('#');
   var type = attr_id_split[0];
-  var attribute_name = attr_id_split[1];
-  var region_id = attr_id_split[2];
+  var attribute_name = att_name;
+  var region_id = regionId;
 
   switch(type) {
   case 'r': // region attribute
