@@ -567,13 +567,13 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
       </div> <!-- end of #navbar -->
 
       <!-- Shortcut toolbar -->
-      <div class="toolbar">
-        <ul>
-          <!--
+      <div class="toolbar" id="toolbar">
+        <!--<ul>
+
           <li onclick="sel_local_images()" title="Load or Add Images">&ctdot;</li>
           <li onclick="sel_local_data_file('annotations')" title="Import Annotations">&uarr;</li>
           <li onclick="download_all_region_data('csv')" title="Save Annotations (as CSV)">&DownArrowBar;</li>
-          -->
+
 
           <li id="toolbar_prev_img" style="margin-left: 1em;" onclick="move_to_prev_image()" title="Previous Image">&larr;</li>
           <li id="toolbar_next_img" onclick="move_to_next_image()" title="Next Image">&rarr;</li>
@@ -583,11 +583,11 @@ Some of the code modules are taken from Abhishek Dutta's codebase.
           <li id="toolbar_zoom_in" onclick="zoom_in()" title="Zoom In">&plus;</li>
           <li id="toolbar_zoom_reset" onclick="reset_zoom_level()" title="Zoom Reset">&equals;</li>
 
-          <!--<li id="toolbar_copy_region" style="margin-left: 2em;" onclick="copy_sel_regions()" title="Copy Region">c</li>
+          <li id="toolbar_copy_region" style="margin-left: 2em;" onclick="copy_sel_regions()" title="Copy Region">c</li>
           <li id="toolbar_paste_region" onclick="paste_sel_regions()" title="Paste Region">v</li>
-          <li id="toolbar_sel_all_region" onclick="sel_all_regions()" title="Select All Regions">a</li>-->
+          <li id="toolbar_sel_all_region" onclick="sel_all_regions()" title="Select All Regions">a</li>
           <li id="toolbar_del_region" onclick="del_sel_regions()" title="Delete Region">&times;</li>
-        </ul>
+        </ul>-->
       </div> <!-- endof #toolbar -->
       <input type="file" id="invisible_file_input" multiple name="files[]" style="display:none">
     </div> <!-- endof #top_panel -->

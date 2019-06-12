@@ -518,6 +518,7 @@ function _init(event) {
   set_variables();
   label_id = event["region_div"];
   show_home_panel();
+  show_toolbar();
   var labels = event["region"];
   var shapes = event["shapes"];
   var shape_id = event["shape_id"];
@@ -561,6 +562,71 @@ function show_home_panel() {
     //document.getElementById('_start_info_panel').innerHTML = start_info;
     //document.getElementById('_start_info_panel').style.display = 'block';
   }
+}
+
+// populates tool bar
+function show_toolbar() {
+  let _toolbar = document.getElementById('toolbar');
+
+  let _list = document.createElement('ul');
+  let _prev = document.createElement('li');
+  _prev.innerHTML = "&larr;";
+  _prev.setAttribute('id', 'toolbar_prev_img');
+  _prev.setAttribute('style', 'margin-left: 1em;');
+  _prev.setAttribute('title', 'Previous Image');
+  _prev.setAttribute('onclick', 'move_to_prev_image()');
+
+  let _nxt = document.createElement('li');
+  _nxt.innerHTML = "&rarr;";
+  _nxt.setAttribute('id', 'toolbar_next_img');
+  //_nxt.setAttribute('style', 'margin-left: 1em;');
+  _nxt.setAttribute('title', 'Next Image');
+  _nxt.setAttribute('onclick', 'move_to_next_image()');
+
+  let _imageli = document.createElement('li');
+  _imageli.innerHTML = "&#9776;";
+  _imageli.setAttribute('id', 'toolbar_list_img');
+  //_imageli.setAttribute('style', 'margin-left: 1em;');
+  _imageli.setAttribute('title', 'List Images');
+  _imageli.setAttribute('onclick', 'toggle_img_list()');
+
+  let _zoomout = document.createElement('li');
+  _zoomout.innerHTML = "&minus;";
+  _zoomout.setAttribute('id', 'toolbar_zoom_out');
+  _zoomout.setAttribute('style', 'margin-left: 2em;');
+  _zoomout.setAttribute('title', 'Zoom Out');
+  _zoomout.setAttribute('onclick', 'zoom_out()');
+
+  let _zoomin = document.createElement('li');
+  _zoomin.innerHTML = "&plus;";
+  _zoomin.setAttribute('id', 'toolbar_zoom_in');
+  //_zoomin.setAttribute('style', 'margin-left: 2em;');
+  _zoomin.setAttribute('title', 'Zoom In');
+  _zoomin.setAttribute('onclick', 'zoom_in()');
+
+  let _zoomreset = document.createElement('li');
+  _zoomreset.innerHTML = "&equals;";
+  _zoomreset.setAttribute('id', 'toolbar_zoom_reset');
+  //_zoomreset.setAttribute('style', 'margin-left: 2em;');
+  _zoomreset.setAttribute('title', 'Zoom Reset');
+  _zoomreset.setAttribute('onclick', 'reset_zoom_level()');
+
+  let _del = document.createElement('li');
+  _del.innerHTML = "&times;";
+  _del.setAttribute('id', 'toolbar_del_region');
+  //_del.setAttribute('style', 'margin-left: 2em;');
+  _del.setAttribute('title', 'Delete Region');
+  _del.setAttribute('onclick', 'del_sel_regions()');
+
+  _list.appendChild(_prev);
+  _list.appendChild(_nxt);
+  _list.appendChild(_imageli);
+  _list.appendChild(_zoomout);
+  _list.appendChild(_zoomin);
+  _list.appendChild(_zoomreset);
+  _list.appendChild(_del);
+  //console.log(_list);
+  _toolbar.appendChild(_list);
 }
 function sel_local_images() {
   // source: https://developer.mozilla.org/en-US/docs/Using_files_from_web_applications
