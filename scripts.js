@@ -432,11 +432,10 @@ function populate_attribute_position(attribute_id){
 
   // <div onclick="toggle_attributes_input_panel()" class="attributes_panel_button">&times;</div>
   var body = document.getElementById(attribute_id);
-  var boxContainer = document.createElement("button");
+  var boxContainer = document.createElement("div");
   // boxContainer.setAttribute("onclick", "toggle_attributes_input_panel()");
   boxContainer.setAttribute("onclick", "populate_popup()");
-  boxContainer.setAttribute("type", "btn btn-primary")
-  boxContainer.setAttribute("style", "font-size: large;margin-left: 0.5em;padding: 1px; background-color: black; color: white;");
+  boxContainer.setAttribute("style", "width: 10px;color: black;font-size: x-large;margin-left: 0.5em;padding: 0;");
   boxContainer.innerHTML = "&times;";
   var center = document.createElement("center");
   var warn = document.createElement("span");
@@ -445,7 +444,7 @@ function populate_attribute_position(attribute_id){
   body.appendChild(boxContainer);
   center.appendChild(warn);
   body.appendChild(center);
-
+  
 }
 
 function required_attributes_filled(){
@@ -457,7 +456,7 @@ function required_attributes_filled(){
   // }
   // console.log(_img_metadata[_image_id].regions);
   var type = _img_metadata[_image_id].regions[_selected_while_input].shape_attributes.type;
-
+  
   for (var col in _region_attributes[type] ){
     var has = _img_metadata[_image_id].regions[_selected_while_input].region_attributes;
     if(_region_attributes[type][col].att_type){
@@ -490,12 +489,12 @@ function populate_popup() {
     _modal_btn.setAttribute("type", "btn btn-primary");
     _modal_btn.innerHTML = "close";
     _modal_btn.style.float = "right";
-    _modal_btn.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; float: right;";
+    _modal_btn.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; float:right;";
     let _modal_btn_2 = document.createElement("button");
     _modal_btn_2.setAttribute("type", "btn btn-primary");
     _modal_btn_2.innerHTML = "clear";
     _modal_btn_2.style.float = "right";
-    _modal_btn_2.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; float: left;";
+    _modal_btn_2.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; margin-left: 380px;";
     _modal_content.appendChild(_modal_btn);
     _modal_content.appendChild(_modal_btn_2);
     _modal_.appendChild(_modal_content);
@@ -507,6 +506,10 @@ function populate_popup() {
     // remove all the selected areas
     _modal_btn_2.onclick = function(){
       _modal_.style.display = "none";
+      var select_shape_con = document.getElementById("region_shape_rect");
+      _current_shape = _REGION_SHAPE['RECT'];
+      select_shape_con.setAttribute('class', 'selected');
+        
       del_sel_and_toggle_regions();
     }
   }
@@ -518,7 +521,6 @@ function _init(event) {
   set_variables();
   label_id = event["region_div"];
   show_home_panel();
-  show_toolbar();
   var labels = event["region"];
   var shapes = event["shapes"];
   var shape_id = event["shape_id"];
@@ -563,71 +565,6 @@ function show_home_panel() {
     //document.getElementById('_start_info_panel').style.display = 'block';
   }
 }
-
-// populates tool bar
-function show_toolbar() {
-  let _toolbar = document.getElementById('toolbar');
-
-  let _list = document.createElement('ul');
-  let _prev = document.createElement('li');
-  _prev.innerHTML = "&larr;";
-  _prev.setAttribute('id', 'toolbar_prev_img');
-  _prev.setAttribute('style', 'margin-left: 1em;');
-  _prev.setAttribute('title', 'Previous Image');
-  _prev.setAttribute('onclick', 'move_to_prev_image()');
-
-  let _nxt = document.createElement('li');
-  _nxt.innerHTML = "&rarr;";
-  _nxt.setAttribute('id', 'toolbar_next_img');
-  //_nxt.setAttribute('style', 'margin-left: 1em;');
-  _nxt.setAttribute('title', 'Next Image');
-  _nxt.setAttribute('onclick', 'move_to_next_image()');
-
-  let _imageli = document.createElement('li');
-  _imageli.innerHTML = "&#9776;";
-  _imageli.setAttribute('id', 'toolbar_list_img');
-  //_imageli.setAttribute('style', 'margin-left: 1em;');
-  _imageli.setAttribute('title', 'List Images');
-  _imageli.setAttribute('onclick', 'toggle_img_list()');
-
-  let _zoomout = document.createElement('li');
-  _zoomout.innerHTML = "&minus;";
-  _zoomout.setAttribute('id', 'toolbar_zoom_out');
-  _zoomout.setAttribute('style', 'margin-left: 2em;');
-  _zoomout.setAttribute('title', 'Zoom Out');
-  _zoomout.setAttribute('onclick', 'zoom_out()');
-
-  let _zoomin = document.createElement('li');
-  _zoomin.innerHTML = "&plus;";
-  _zoomin.setAttribute('id', 'toolbar_zoom_in');
-  //_zoomin.setAttribute('style', 'margin-left: 2em;');
-  _zoomin.setAttribute('title', 'Zoom In');
-  _zoomin.setAttribute('onclick', 'zoom_in()');
-
-  let _zoomreset = document.createElement('li');
-  _zoomreset.innerHTML = "&equals;";
-  _zoomreset.setAttribute('id', 'toolbar_zoom_reset');
-  //_zoomreset.setAttribute('style', 'margin-left: 2em;');
-  _zoomreset.setAttribute('title', 'Zoom Reset');
-  _zoomreset.setAttribute('onclick', 'reset_zoom_level()');
-
-  let _del = document.createElement('li');
-  _del.innerHTML = "&times;";
-  _del.setAttribute('id', 'toolbar_del_region');
-  //_del.setAttribute('style', 'margin-left: 2em;');
-  _del.setAttribute('title', 'Delete Region');
-  _del.setAttribute('onclick', 'del_sel_regions()');
-
-  _list.appendChild(_prev);
-  _list.appendChild(_nxt);
-  _list.appendChild(_imageli);
-  _list.appendChild(_zoomout);
-  _list.appendChild(_zoomin);
-  _list.appendChild(_zoomreset);
-  _list.appendChild(_del);
-  //console.log(_list);
-  _toolbar.appendChild(_list);
-}
 function sel_local_images() {
   // source: https://developer.mozilla.org/en-US/docs/Using_files_from_web_applications
   if (invisible_file_input) {
@@ -639,24 +576,17 @@ function sel_local_images() {
 function download_all_region_data(type) {
   // Javascript strings (DOMString) is automatically converted to utf-8
   // see: https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
+  var all_region_data = pack_metadata(type);
+  var blob_attr = {type: 'text/'+type+';charset=utf-8'};
+  var all_region_data_blob = new Blob(all_region_data, blob_attr);
 
-  // Save only if all the required fields are required attributes are filled
-  //console.log(required_attributes_filled())
-  //if(required_attributes_filled()){
-    var all_region_data = pack_metadata(type);
-    var blob_attr = {type: 'text/'+type+';charset=utf-8'};
-    var all_region_data_blob = new Blob(all_region_data, blob_attr);
-
-    if ( all_region_data_blob.size > (2*1024*1024) &&
-        type === 'csv' ) {
-          show_message('CSV file size is ' + (all_region_data_blob.size/(1024*1024)) +
-                  ' MB. We advise you to instead download as JSON');
-    } else {
-      save_data_to_local_file(all_region_data_blob, '_region_data.'+type);
-    }
-  //} else {
-    //populate_popup();
-  //}
+  if ( all_region_data_blob.size > (2*1024*1024) &&
+       type === 'csv' ) {
+    show_message('CSV file size is ' + (all_region_data_blob.size/(1024*1024)) +
+                 ' MB. We advise you to instead download as JSON');
+  } else {
+    save_data_to_local_file(all_region_data_blob, '_region_data.'+type);
+  }
 }
 
 function sel_local_data_file(type) {
@@ -1287,40 +1217,43 @@ function _load_canvas_regions() {
 // updates currently selected region shape
 function select_region_shape(sel_shape_name) {
   // console.log(sel_shape_name);
-  for ( var shape_name in _REGION_SHAPE ) {
-    var ui_element = document.getElementById('region_shape_' + _REGION_SHAPE[shape_name]);
-    ui_element.classList.remove('selected');
+
+  if (!_is_reg_attr_panel_visible){
+    for ( var shape_name in _REGION_SHAPE ) {
+      var ui_element = document.getElementById('region_shape_' + _REGION_SHAPE[shape_name]);
+      ui_element.classList.remove('selected');
+    }
+
+    _current_shape = sel_shape_name;
+    var ui_element = document.getElementById('region_shape_' + _current_shape);
+    ui_element.classList.add('selected');
+  // console.log("switch");
+    switch(_current_shape) {
+    case _REGION_SHAPE.RECT: // Fall-through
+    case _REGION_SHAPE.CIRCLE: // Fall-through
+    case _REGION_SHAPE.ELLIPSE:
+      show_message('Press single click and drag mouse to draw ' +
+                   _current_shape + ' region');
+      break;
+
+    case _REGION_SHAPE.POLYGON:
+      _is_user_drawing_polygon = false;
+      _current_polygon_region_id = -1;
+
+      show_message('Press single click to define polygon vertices and ' +
+                   'click first vertex to close path');
+      break;
+
+    case _REGION_SHAPE.POINT:
+      show_message('Press single click to define points (or landmarks)');
+      break;
+
+    default:
+      show_message('Unknown shape selected!');
+      break;
+    }
+    // console.log("selected");
   }
-
-  _current_shape = sel_shape_name;
-  var ui_element = document.getElementById('region_shape_' + _current_shape);
-  ui_element.classList.add('selected');
-// console.log("switch");
-  switch(_current_shape) {
-  case _REGION_SHAPE.RECT: // Fall-through
-  case _REGION_SHAPE.CIRCLE: // Fall-through
-  case _REGION_SHAPE.ELLIPSE:
-    show_message('Press single click and drag mouse to draw ' +
-                 _current_shape + ' region');
-    break;
-
-  case _REGION_SHAPE.POLYGON:
-    _is_user_drawing_polygon = false;
-    _current_polygon_region_id = -1;
-
-    show_message('Press single click to define polygon vertices and ' +
-                 'click first vertex to close path');
-    break;
-
-  case _REGION_SHAPE.POINT:
-    show_message('Press single click to define points (or landmarks)');
-    break;
-
-  default:
-    show_message('Unknown shape selected!');
-    break;
-  }
-  // console.log("selected");
 }
 
 function set_all_canvas_size(w, h) {
@@ -3450,10 +3383,10 @@ function del_sel_regions() {
   _is_all_region_selected = false;
   _is_region_selected     = false;
   _user_sel_region_id     = -1;
-
+  
   if (_is_reg_attr_panel_visible)
       toggle_reg_attr_panel();
-
+    
   if ( _canvas_regions.length === 0 ) {
     // all regions were deleted, hence clear region canvas
     _clear_reg_canvas();
@@ -3496,11 +3429,11 @@ function del_sel_and_toggle_regions() {
     else{
       selected_num = sorted_sel_reg_id[0];
     }
-    for ( var i = 0; i < sorted_sel_reg_id.length; ++i ) {
-      _canvas_regions.splice( sorted_sel_reg_id[i], 1);
-      _img_metadata[_image_id].regions.splice( sorted_sel_reg_id[i], 1);
+    // for ( var i = 0; i < sorted_sel_reg_id.length; ++i ) {
+      _canvas_regions.splice( selected_num, 1);
+      _img_metadata[_image_id].regions.splice( selected_num, 1);
       del_region_count += 1;
-    }
+    // }
   }
 
   _is_all_region_selected = false;
@@ -3888,7 +3821,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
     } else {
       region_traversal_order = all_reg_list;
     }
-
+  
 
 
   var attrtable = document.createElement('table');
@@ -3905,7 +3838,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
   // console.log(type);
   // console.log(sel_reg_list);
   // console.log("----");
-
+  
   // allow adding new attributes
   // console.log(type[0]);
   // firstrow.insertCell(-1).innerHTML = '<input type="text"' +
@@ -3991,7 +3924,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
                   ' onfocus="attr_input_focus(' + row_i + ');" />';
             }
           }
-
+          
         }
       else{
       if ( key == data[sel_reg_list[0]].shape_attributes.type ) {
@@ -4215,6 +4148,12 @@ function toggle_attributes_input_panel() {
 }
 
 function toggle_reg_attr_panel() {
+
+  for ( var shape_name in _REGION_SHAPE ) {
+      var ui_element = document.getElementById('region_shape_' + _REGION_SHAPE[shape_name]);
+      ui_element.classList.remove('selected');
+  }
+  _current_shape = "";
   if ( _current_image_loaded ) {
     // var panel = document.getElementById('reg_attr_panel_button');
     // panel.classList.toggle('active');
@@ -4238,7 +4177,7 @@ function toggle_reg_attr_panel() {
         attributes_panel.focus();
       }
     } else {
-
+     
       update_region_attributes_input_panel();
        _is_attributes_panel_visible = true;
       _is_reg_attr_panel_visible = true;
@@ -4304,7 +4243,7 @@ function update_attribute_value(attr_id, att_name, regionId, value) {
       attributes_values[attr_id] = value;
       update_region_attributes_input_panel();
     }
-
+    
     break;
 
   case 'f': // file attribute
