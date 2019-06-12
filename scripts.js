@@ -474,6 +474,9 @@ function populate_popup() {
   //Check for condition
   if(required_attributes_filled()){
     toggle_attributes_input_panel();
+    var select_shape_con = document.getElementById("region_shape_rect");
+    _current_shape = _REGION_SHAPE['RECT'];
+    select_shape_con.setAttribute('class', 'selected');
   }
 
   else{
@@ -502,6 +505,9 @@ function populate_popup() {
 
     _modal_btn.onclick = function(){
       _modal_.style.display = "none";
+      var select_shape_con = document.getElementById("region_shape_rect");
+      _current_shape = _REGION_SHAPE['RECT'];
+      select_shape_con.setAttribute('class', 'selected');
     }
     // remove all the selected areas
     _modal_btn_2.onclick = function(){
