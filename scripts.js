@@ -490,12 +490,12 @@ function populate_popup() {
     _modal_btn.setAttribute("type", "btn btn-primary");
     _modal_btn.innerHTML = "close";
     _modal_btn.style.float = "right";
-    _modal_btn.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; float:right;";
+    _modal_btn.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; float: right;";
     let _modal_btn_2 = document.createElement("button");
     _modal_btn_2.setAttribute("type", "btn btn-primary");
     _modal_btn_2.innerHTML = "clear";
     _modal_btn_2.style.float = "right";
-    _modal_btn_2.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; margin-left: 380px;";
+    _modal_btn_2.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; float: left;";
     _modal_content.appendChild(_modal_btn);
     _modal_content.appendChild(_modal_btn_2);
     _modal_.appendChild(_modal_content);
@@ -639,17 +639,24 @@ function sel_local_images() {
 function download_all_region_data(type) {
   // Javascript strings (DOMString) is automatically converted to utf-8
   // see: https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
-  var all_region_data = pack_metadata(type);
-  var blob_attr = {type: 'text/'+type+';charset=utf-8'};
-  var all_region_data_blob = new Blob(all_region_data, blob_attr);
 
-  if ( all_region_data_blob.size > (2*1024*1024) &&
-       type === 'csv' ) {
-    show_message('CSV file size is ' + (all_region_data_blob.size/(1024*1024)) +
-                 ' MB. We advise you to instead download as JSON');
-  } else {
-    save_data_to_local_file(all_region_data_blob, '_region_data.'+type);
-  }
+  // Save only if all the required fields are required attributes are filled
+  //console.log(required_attributes_filled())
+  //if(required_attributes_filled()){
+    var all_region_data = pack_metadata(type);
+    var blob_attr = {type: 'text/'+type+';charset=utf-8'};
+    var all_region_data_blob = new Blob(all_region_data, blob_attr);
+
+    if ( all_region_data_blob.size > (2*1024*1024) &&
+        type === 'csv' ) {
+          show_message('CSV file size is ' + (all_region_data_blob.size/(1024*1024)) +
+                  ' MB. We advise you to instead download as JSON');
+    } else {
+      save_data_to_local_file(all_region_data_blob, '_region_data.'+type);
+    }
+  //} else {
+    //populate_popup();
+  //}
 }
 
 function sel_local_data_file(type) {
