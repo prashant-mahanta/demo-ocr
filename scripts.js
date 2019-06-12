@@ -432,10 +432,11 @@ function populate_attribute_position(attribute_id){
 
   // <div onclick="toggle_attributes_input_panel()" class="attributes_panel_button">&times;</div>
   var body = document.getElementById(attribute_id);
-  var boxContainer = document.createElement("div");
+  var boxContainer = document.createElement("button");
   // boxContainer.setAttribute("onclick", "toggle_attributes_input_panel()");
   boxContainer.setAttribute("onclick", "populate_popup()");
-  boxContainer.setAttribute("style", "width: 10px;color: black;font-size: x-large;margin-left: 0.5em;padding: 0;");
+  boxContainer.setAttribute("type", "btn btn-primary")
+  boxContainer.setAttribute("style", "font-size: large;margin-left: 0.5em;padding: 1px; background-color: black; color: white;");
   boxContainer.innerHTML = "&times;";
   var center = document.createElement("center");
   var warn = document.createElement("span");
@@ -444,7 +445,7 @@ function populate_attribute_position(attribute_id){
   body.appendChild(boxContainer);
   center.appendChild(warn);
   body.appendChild(center);
-  
+
 }
 
 function required_attributes_filled(){
@@ -456,7 +457,7 @@ function required_attributes_filled(){
   // }
   // console.log(_img_metadata[_image_id].regions);
   var type = _img_metadata[_image_id].regions[_selected_while_input].shape_attributes.type;
-  
+
   for (var col in _region_attributes[type] ){
     var has = _img_metadata[_image_id].regions[_selected_while_input].region_attributes;
     if(_region_attributes[type][col].att_type){
@@ -3376,10 +3377,10 @@ function del_sel_regions() {
   _is_all_region_selected = false;
   _is_region_selected     = false;
   _user_sel_region_id     = -1;
-  
+
   if (_is_reg_attr_panel_visible)
       toggle_reg_attr_panel();
-    
+
   if ( _canvas_regions.length === 0 ) {
     // all regions were deleted, hence clear region canvas
     _clear_reg_canvas();
@@ -3814,7 +3815,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
     } else {
       region_traversal_order = all_reg_list;
     }
-  
+
 
 
   var attrtable = document.createElement('table');
@@ -3831,7 +3832,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
   // console.log(type);
   // console.log(sel_reg_list);
   // console.log("----");
-  
+
   // allow adding new attributes
   // console.log(type[0]);
   // firstrow.insertCell(-1).innerHTML = '<input type="text"' +
@@ -3917,7 +3918,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
                   ' onfocus="attr_input_focus(' + row_i + ');" />';
             }
           }
-          
+
         }
       else{
       if ( key == data[sel_reg_list[0]].shape_attributes.type ) {
@@ -4164,7 +4165,7 @@ function toggle_reg_attr_panel() {
         attributes_panel.focus();
       }
     } else {
-     
+
       update_region_attributes_input_panel();
        _is_attributes_panel_visible = true;
       _is_reg_attr_panel_visible = true;
@@ -4230,7 +4231,7 @@ function update_attribute_value(attr_id, att_name, regionId, value) {
       attributes_values[attr_id] = value;
       update_region_attributes_input_panel();
     }
-    
+
     break;
 
   case 'f': // file attribute
