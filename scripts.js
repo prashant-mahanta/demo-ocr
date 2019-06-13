@@ -497,7 +497,7 @@ function populate_popup() {
     _modal_btn_2.setAttribute("type", "btn btn-primary");
     _modal_btn_2.innerHTML = "clear";
     _modal_btn_2.style.float = "right";
-    _modal_btn_2.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; margin-left: 380px;";
+    _modal_btn_2.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; float: left";
     _modal_content.appendChild(_modal_btn);
     _modal_content.appendChild(_modal_btn_2);
     _modal_.appendChild(_modal_content);
