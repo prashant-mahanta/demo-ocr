@@ -2,7 +2,7 @@
 
 Include the *scripts.js* file into your HTML file.
 ```HTML
-<script type="text/javascript" src="https://github.com/prashant-mahanta/demo-ocr/blob/master/scripts.js"></script>
+<script type="text/javascript" src="scripts.js"></script>
 ```
  
  The *scripts.js* file can be initialized using *_init()* function. It requires a javascript object as an input.
