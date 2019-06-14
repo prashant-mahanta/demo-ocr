@@ -228,9 +228,11 @@ function populate_region_list(legendList, label_id) {
 function populate_shape_list(shapes, shape_id) {
     var container = document.getElementById(shape_id);
     var c = 0
+    // console.log("shape container:");
+    // console.log(container);
     for (var key in shapes) {
       //populating legend with colors
-
+      // console.log(shapes);
         _REGION_SHAPE[ shapes[key]["region_shape"] ] = shapes[key]["code"];
 
         var boxContainer = document.createElement("li");
@@ -260,9 +262,13 @@ function populate_shape_list(shapes, shape_id) {
         boxContainer.appendChild(box);
         // boxContainer.appendChild(box);
         // boxContainer.appendChild(label);
+        // console.log("box container");
+        // console.log(boxContainer);
         container.appendChild(boxContainer);
+        // console.log(container);
 
    }
+
 
 }
 
@@ -526,7 +532,9 @@ function _init(event) {
   show_body();
   set_variables();
   init_canvas("image_canvas", "region_canvas");
-
+  update_eventListeners();
+  
+  
   label_id = "legend";
   show_home_panel();
   var labels = event["region"];
@@ -1695,6 +1703,8 @@ function show_modal_for_attribute(){
 // Image click handlers
 //
 
+function update_eventListeners(){
+
 // enter annotation mode on double click
 _reg_canvas.addEventListener('dblclick', function(e) {
   _click_x0 = e.offsetX; _click_y0 = e.offsetY;
@@ -2566,7 +2576,7 @@ _reg_canvas.addEventListener('mousemove', function(e) {
   }
 });
 
-
+}
 //
 // Canvas update routines
 //
