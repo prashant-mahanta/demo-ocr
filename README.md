@@ -13,16 +13,13 @@ Include the *scripts.js* file into your HTML file.
  ```
  
  The object should have the following properties:   
- * *region_div*
+ * *container_div*
  * *region*
- * *shape_id*
- * *shapes*
- * *canvas_id*        
- * *region_canvas_id*
+ * *shapes*    
  
 The *region_div* property carries the id of the container for rendering regions.
 ```Javascript
-region_div: "container id"
+container_div: "container id"
 ```
 
 The *region* is an array of objects, each object specifying a region.
@@ -75,9 +72,7 @@ shapes: [
 ## Example
 ```Javascript
 _init({
-        canvas_id: "image_canvas",
-        region_canvas_id: "region_canvas",
-        region_div: "legend" ,
+        container_id: "master",
         region: [
           {
             region_id: 1,
@@ -108,7 +103,6 @@ _init({
             region_attributes: [ {att_name: "abcd", att_type: true }, { att_name: "mabc", att_type: true }]
           }
         ],
-        shape_id: "accordion_region_shape_panel",
         shapes: [
           {
             name: 'rectangle',
