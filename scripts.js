@@ -57,10 +57,10 @@ var _current_image_width;
 var _current_image_height;
 
 // image canvas
-var _img_canvas = document.getElementById("image_canvas");
-var _img_ctx   = _img_canvas.getContext("2d");
-var _reg_canvas = document.getElementById("region_canvas");
-var _reg_ctx    = _reg_canvas.getContext("2d");
+var _img_canvas ;//= document.getElementById("image_canvas");
+var _img_ctx   ;//= _img_canvas.getContext("2d");
+var _reg_canvas ;//= document.getElementById("region_canvas");
+var _reg_ctx    ;//= _reg_canvas.getContext("2d");
 var _canvas_width, _canvas_height;
 
 // canvas zoom
@@ -421,9 +421,9 @@ function set_variables(){
 
 function init_canvas(canvas_id, region_canvas_id){
   // image canvas
- _img_canvas = document.getElementById(canvas_id);
+ _img_canvas = document.getElementById("image_canvas");
  _img_ctx    = _img_canvas.getContext("2d");
- _reg_canvas = document.getElementById(region_canvas_id);
+ _reg_canvas = document.getElementById("region_canvas");
  _reg_ctx    = _reg_canvas.getContext("2d");
  _canvas_width, _canvas_height;
 }
@@ -444,7 +444,7 @@ function populate_attribute_position(attribute_id){
   body.appendChild(boxContainer);
   center.appendChild(warn);
   body.appendChild(center);
-  
+
 }
 
 function required_attributes_filled(){
@@ -456,7 +456,7 @@ function required_attributes_filled(){
   // }
   // console.log(_img_metadata[_image_id].regions);
   var type = _img_metadata[_image_id].regions[_selected_while_input].shape_attributes.type;
-  
+
   for (var col in _region_attributes[type] ){
     var has = _img_metadata[_image_id].regions[_selected_while_input].region_attributes;
     if(_region_attributes[type][col].att_type){
@@ -515,7 +515,7 @@ function populate_popup() {
       var select_shape_con = document.getElementById("region_shape_rect");
       _current_shape = _REGION_SHAPE['RECT'];
       select_shape_con.setAttribute('class', 'selected');
-        
+
       del_sel_and_toggle_regions();
     }
   }
@@ -523,13 +523,15 @@ function populate_popup() {
 
 
 function _init(event) {
-  init_canvas(event["canvas_id"], event["region_canvas_id"]);
+  show_body();
   set_variables();
-  label_id = event["region_div"];
+  init_canvas("image_canvas", "region_canvas");
+
+  label_id = "legend";
   show_home_panel();
   var labels = event["region"];
   var shapes = event["shapes"];
-  var shape_id = event["shape_id"];
+  var shape_id = "accordion_region_shape_panel";
 
   for (var i = 0; i < labels.length; i++) {
     legendList[ labels[i]["region_name"] ] = labels[i]["region_color"];
@@ -557,6 +559,218 @@ function _init(event) {
   }
 }
 
+function show_body(){
+  var master = document.getElementById("master");
+  master.innerHTML = '<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\
+    <defs>\
+      <symbol id="shape_rectangle">\
+        <title>Rectangular region shape</title>\
+        <rect width="20" height="12" x="6" y="10" stroke-width="2"/>\
+      </symbol>\
+      <symbol id="shape_circle">\
+        <title>Circular region shape</title>\
+        <circle r="10" cx="16" cy="16" stroke-width="2"/>\
+      </symbol>\
+      <symbol id="shape_ellipse">\
+        <title>Elliptical region shape</title>\
+        <ellipse rx="12" ry="8" cx="16" cy="16" stroke-width="2"/>\
+      </symbol>\
+      <symbol id="shape_polygon">\
+        <title>Polyline region shape</title>\
+        <path d="M 15.25,2.2372 3.625,11.6122 6,29.9872 l 20.75,-9.625 2.375,-14.75 z" stroke-width="2"/>\
+      </symbol>\
+    </defs>\
+  </svg>\
+  \
+  <div class="top_panel" id="ui_top_panel">\
+    <!-- Navigation menu -->\
+    <div class="navbar">\
+      <ul>\
+        <li><a onclick="show_home_panel()" title="Home">Home</a></li>\
+        <li class="dropdown"><a title="Image" class="drop_menu_item">Image &#9662;</a>\
+          <div class="dropdown-content">\
+            <a onclick="sel_local_images()" title="Load (or add) a set of images from local disk">Load or Add Images</a>\
+            <a onclick="show_img_list()" title="Browse currently loaded images">List Images</a>\
+          </div>\
+        </li>\
+        <li class="dropdown"><a title="Annotations" class="drop_menu_item">Annotation &#9662;</a>\
+          <div class="dropdown-content">\
+            <a onclick="sel_local_data_file(\'annotations\')" title="Import existing region data from CSV or JSON file">Import</a>\
+            <a onclick="download_all_region_data(\'csv\')" title="Save image region annotations as a CSV(comma separated value) file">Save as CSV</a>\
+            <a onclick="download_all_region_data(\'json\')" title="Save image region annotations as a JSON(Javascript Object Notation) file">Save as JSON</a>\
+            <a onclick="show_annotation_data()" title="View annotations">View annotations</a>\
+          </div>\
+        </li>\
+        <li class="dropdown"><a title="View" class="drop_menu_item">View &#9662;</a>\
+          <div class="dropdown-content">\
+            <a onclick="toggle_leftsidebar()" title="Show/hide left sidebar">Show/hide left sidebar</a>\
+            <a onclick="toggle_region_boundary_visibility()" title="Show or hide region boundaries">Show/hide region boundaries</a>\
+            <a onclick="toggle_region_id_visibility()" title="Show or hide region labels">Show/hide region labels</a>\
+          </div>\
+        </li>\
+        <li class="dropdown"><a title="Change Region" class="drop_menu_item">Change Region &#9662;</a>\
+          <div class="dropdown-content" id="region_dropdown">\
+            <!-- <a onclick="change_region_text()" title="Change Region type to Text">Text</a>\
+            <a onclick="change_region_graphic()" title="Change Region type to Graphic">Graphic</a>\
+            <a onclick="change_region_equation()" title="Change Region type to Equation">Equation</a>\
+            <a onclick="change_region_title()" title="Change Region type to Title">Title</a> -->\
+          </div>\
+        </li>\
+        <li><a title="New Region">New Region</a></li>\
+        <!-- The Modal -->\
+<div id="myModal" class="modal">\
+\
+<!-- Modal content -->\
+<div class="modal-content">\
+  <span class="close">&times;</span>\
+\
+  <!-- <form action="#" onsubmit="return validateFormOnSubmit(this);"> -->\
+    <p style="color:black;">Region Name : </p><input type="text" name="region_name" placeholder= "region name" id="region_name" value="" required><br>\
+    <p style="color:black;">Region Description : </p><input type="text" name="region_desc" placeholder= "Region Description" id="region_desc" value="" required><br>\
+    <input type="color" id="region_color" name="region_color"\
+         value="#e66465">\
+  <label for="head">Head</label>\
+\
+    <input type="submit" value="Submit" onclick="validateFormOnSubmit({ region_name_id: \'region_name\', region_desc_id: \'region_desc\', region_color_id: \'region_color\'})">\
+    <!-- </form> -->\
+ <!-- <input type="text" name="fname"><br> -->\
+</div>\
+\
+</div>\
+      </ul>\
+\
+    </div> <!-- end of #navbar -->\
+\
+    <!-- Shortcut toolbar -->\
+    <div class="toolbar">\
+      <ul>\
+        <!--\
+        <li onclick="sel_local_images()" title="Load or Add Images">&ctdot;</li>\
+        <li onclick="sel_local_data_file(\'annotations\')" title="Import Annotations">&uarr;</li>\
+        <li onclick="download_all_region_data(\'csv\')" title="Save Annotations (as CSV)">&DownArrowBar;</li>\
+        -->\
+\
+        <li id="toolbar_prev_img" style="margin-left: 1em;" onclick="move_to_prev_image()" title="Previous Image">&larr;</li>\
+        <li id="toolbar_next_img" onclick="move_to_next_image()" title="Next Image">&rarr;</li>\
+        <li id="toolbar_list_img" onclick="toggle_img_list()" title="List Images">&#9776;</li>\
+\
+        <li id="toolbar_zoom_out" style="margin-left: 2em;" onclick="zoom_out()" title="Zoom Out">&minus;</li>\
+        <li id="toolbar_zoom_in" onclick="zoom_in()" title="Zoom In">&plus;</li>\
+        <li id="toolbar_zoom_reset" onclick="reset_zoom_level()" title="Zoom Reset">&equals;</li>\
+\
+        <!--<li id="toolbar_copy_region" style="margin-left: 2em;" onclick="copy_sel_regions()" title="Copy Region">c</li>\
+        <li id="toolbar_paste_region" onclick="paste_sel_regions()" title="Paste Region">v</li>\
+        <li id="toolbar_sel_all_region" onclick="sel_all_regions()" title="Select All Regions">a</li>-->\
+        <li id="toolbar_del_region" onclick="del_sel_regions()" title="Delete Region">&times;</li>\
+      </ul>\
+    </div> <!-- endof #toolbar -->\
+    <input type="file" id="invisible_file_input" multiple name="files[]" style="display:none">\
+  </div> <!-- endof #top_panel -->\
+\
+  <!-- Middle Panel contains a left-sidebar and image display areas -->\
+  <div class="middle_panel">\
+    <div id="leftsidebar">\
+      <button onclick="toggle_region_shape_list(this)" id= "region_shapes" class="leftsidebar_accordion active">Region Shape</button>\
+      <div class="leftsidebar_accordion_panel show" >\
+        <ul class="region_shape" id="accordion_region_shape_panel">\
+          <!-- <li id="region_shape_rect" class="selected" onclick="select_region_shape(\'rect\')" title="Rectangle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_rectangle"></use></svg></li> -->\
+\
+\
+          <!--\
+            <li id="region_shape_point" onclick="select_region_shape(\'point\')" title="Point"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_point"></use></svg></li>\
+\
+          <li id="region_shape_ellipse" onclick="select_region_shape(\'ellipse\')" title="Ellipse"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_ellipse"></use></svg></li>\
+          -->\
+          <!-- <li id="region_shape_polygon" onclick="select_region_shape(\'polygon\')" title="Polygon"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_polygon"></use></svg></li> -->\
+\
+\
+\
+          <!-- <li id="region_shape_circle" onclick="select_region_shape(\'circle\')" title="Circle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_circle"></use></svg></li> -->\
+\
+        </ul>\
+      </div>\
+\
+      <button onclick="toggle_img_list(this)" class="leftsidebar_accordion" id="loaded_img_panel">Loaded Images</button>\
+      <div class="leftsidebar_accordion_panel" id="img_list_panel"></div>\
+\
+      <button class="leftsidebar_accordion" id="reg_attr_panel_button">Region</button>\
+      <div id="legend">\
+      </div>\
+      <!--<button onclick="toggle_file_attr_panel()" class="leftsidebar_accordion" id="file_attr_panel_button">File Attributes</button>\
+\
+      <button onclick="toggle_accordion_panel(this)" class="leftsidebar_accordion">Keyboard Shortcuts</button>-->\
+      <div class="leftsidebar_accordion_panel">\
+        <table style="padding: 2em 0em;">\
+          <tr>\
+            <td style="width: 6em;">n/p (&larr;/&rarr;)</td>\
+            <td>Next/Previous image</td>\
+          </tr>\
+          <tr>\
+            <td>+&nbsp;/&nbsp;-&nbsp;/&nbsp;=</td>\
+            <td>Zoom in/out/reset</td>\
+          </tr>\
+          <tr>\
+            <td>Ctrl + c</td>\
+            <td>Copy sel. regions</td>\
+          </tr>\
+          <tr>\
+            <td>Ctrl + v</td>\
+            <td>Paste sel. regions</td>\
+          </tr>\
+          <tr>\
+            <td>Ctrl + a</td>\
+            <td>Select all regions</td>\
+          </tr>\
+          <tr>\
+            <td>Del, Bkspc</td>\
+            <td>Delete image region</td>\
+          </tr>\
+          <tr> \
+            <td>Esc</td>\
+            <td>Cancel operation</td>\
+          </tr>\
+          <tr>\
+            <td>Ctrl + s</td>\
+            <td>Download annotations</td>\
+          </tr>\
+          <tr>\
+            <td>Spacebar</td>\
+            <td>Toggle image list</td>\
+          </tr>\
+        </table>\
+      </div>\
+\
+    </div> <!-- end of leftsidebar -->\
+    <div id="leftsidebar_collapse_panel">\
+      <div onclick="toggle_leftsidebar()" id="leftsidebar_collapse_button" title="Show/hide left toolbar">\
+        &ltrif;</div>\
+    </div>\
+\
+    <!-- Main display area: contains image canvas, ... -->\
+    <div id="display_area">\
+      <div id="canvas_panel">\
+        <canvas id="image_canvas"></canvas>\
+        <canvas id="region_canvas">Sorry, your browser does not support HTML5 Canvas functionality which is required for this application.</canvas>\
+      </div>\
+    </div>\
+  </div>\
+\
+  <!-- region and file attributes input panel -->\
+  <div id="attributes_panel">\
+    <div id="attributes_panel_toolbar">\
+      <!-- <div onclick="toggle_attributes_input_panel()" class="attributes_panel_button">&times;</div> -->\
+    </div>\
+    <table id="attributes_panel_table"></table>\
+  </div>\
+\
+  <!-- to show status messages -->\
+  <div id="message_panel"></div>\
+\
+  <!-- this vertical spacer is needed to allow scrollbar to show\
+       items like Keyboard Shortcut hidden under the attributes panel -->\
+  <div style="width: 100%;" id="vertical_space"></div>';
+}
+
 //
 // Handlers for top navigation bar
 //
@@ -568,7 +782,7 @@ function show_home_panel() {
     var start_info = '<p><a title="Load or Add Images" style="cursor: pointer; color: blue;" onclick="sel_local_images()">Load images</a> to start annotation or, see <a title="Getting started with  Image Annotator" style="cursor: pointer; color: blue;" onclick="show_getting_started_panel()">Getting Started</a>.</p>';
     clear_image_display_area();
     //document.getElementById('_start_info_panel').innerHTML = start_info;
-    //document.getElementById('_start_info_panel').style.display = 'block';
+    //document.getElementById('_start_info_panel_).style.display = 'block';
   }
 }
 function sel_local_images() {
@@ -1487,7 +1701,7 @@ _reg_canvas.addEventListener('dblclick', function(e) {
   var region_id = is_inside_region(_click_x0, _click_y0);
 
   if (region_id !== -1) {
-    // user clicked inside a region, show attribute panel
+    // user clicked inside a region, show attribute panel\
     if(!_is_reg_attr_panel_visible) {
       toggle_reg_attr_panel();
     }
@@ -3389,10 +3603,10 @@ function del_sel_regions() {
   _is_all_region_selected = false;
   _is_region_selected     = false;
   _user_sel_region_id     = -1;
-  
+
   if (_is_reg_attr_panel_visible)
       toggle_reg_attr_panel();
-    
+
   if ( _canvas_regions.length === 0 ) {
     // all regions were deleted, hence clear region canvas
     _clear_reg_canvas();
@@ -3827,7 +4041,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
     } else {
       region_traversal_order = all_reg_list;
     }
-  
+
 
 
   var attrtable = document.createElement('table');
@@ -3844,7 +4058,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
   // console.log(type);
   // console.log(sel_reg_list);
   // console.log("----");
-  
+
   // allow adding new attributes
   // console.log(type[0]);
   // firstrow.insertCell(-1).innerHTML = '<input type="text"' +
@@ -3930,7 +4144,7 @@ function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
                   ' onfocus="attr_input_focus(' + row_i + ');" />';
             }
           }
-          
+
         }
       else{
       if ( key == data[sel_reg_list[0]].shape_attributes.type ) {
@@ -4183,7 +4397,7 @@ function toggle_reg_attr_panel() {
         attributes_panel.focus();
       }
     } else {
-     
+
       update_region_attributes_input_panel();
        _is_attributes_panel_visible = true;
       _is_reg_attr_panel_visible = true;
@@ -4249,7 +4463,7 @@ function update_attribute_value(attr_id, att_name, regionId, value) {
       attributes_values[attr_id] = value;
       update_region_attributes_input_panel();
     }
-    
+
     break;
 
   case 'f': // file attribute
