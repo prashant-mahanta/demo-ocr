@@ -529,7 +529,7 @@ function populate_popup() {
 
 
 function _init(event) {
-  show_body();
+  show_body(event["container_id"]);
   set_variables();
   init_canvas("image_canvas", "region_canvas");
   update_eventListeners();
@@ -567,8 +567,8 @@ function _init(event) {
   }
 }
 
-function show_body(){
-  var master = document.getElementById("master");
+function show_body(container_id){
+  var master = document.getElementById(container_id);
   master.innerHTML = '<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\
     <defs>\
       <symbol id="shape_rectangle">\

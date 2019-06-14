@@ -20,15 +20,13 @@
     <link rel="stylesheet" href="styles.css">
   </head>
 
-  <body onresize="_update_ui_components()" id="master">
-
+  <body onresize="_update_ui_components()" >
+    <div id="master" ></div>
 
     <script type="text/javascript" src="scripts.js"></script>
     <script type="text/javascript">
       _init({
-        //canvas_id: "image_canvas",
-        //region_canvas_id: "region_canvas",
-        //region_div: "legend" ,
+        container_id: "master",
         region: [
           {
             region_id: 1,
@@ -59,7 +57,6 @@
             region_attributes: [ {att_name: "abcd", att_type: true }, { att_name: "mabc", att_type: true }]
           }
         ],
-        //shape_id: "accordion_region_shape_panel",
         shapes: [
           {
             name: 'rectangle',
