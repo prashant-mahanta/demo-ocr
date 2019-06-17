@@ -476,16 +476,27 @@ function required_attributes_filled(){
 
 }
 
+function reload_shape_division(){
+  var shape = document.getElementById("region_shape_rect");
+  console.log(shape.class);
+  console.log(shape);
+}
 function populate_popup() {
   //Check for condition
   if(required_attributes_filled()){
+    
     toggle_attributes_input_panel();
     var select_shape_con = document.getElementById("region_shape_rect");
     _current_shape = _REGION_SHAPE['RECT'];
-    select_shape_con.setAttribute('class', 'selected');
+    select_shape_con.class = "selected";
+    select_shape_con.classList.toggle("selected");
+    reload_shape_division();
+    _redraw_reg_canvas();
+    _reg_canvas.focus();
   }
 
   else{
+
     let container = document.getElementById("canvas_panel");
     let _modal_ = document.createElement("DIV");
     _modal_.setAttribute("id", "popup");
@@ -511,18 +522,31 @@ function populate_popup() {
 
     _modal_btn.onclick = function(){
       _modal_.style.display = "none";
-      var select_shape_con = document.getElementById("region_shape_rect");
-      _current_shape = _REGION_SHAPE['RECT'];
-      select_shape_con.setAttribute('class', 'selected');
+      // var select_shape_con = document.getElementById("region_shape_rect");
+      // _current_shape = _REGION_SHAPE['RECT'];
+      // select_shape_con.class = "selected";
+      reload_shape_division();
     }
     // remove all the selected areas
     _modal_btn_2.onclick = function(){
       _modal_.style.display = "none";
       var select_shape_con = document.getElementById("region_shape_rect");
       _current_shape = _REGION_SHAPE['RECT'];
-      select_shape_con.setAttribute('class', 'selected');
-
+      console.log("current shape: " + _current_shape);
+      // select_shape_con.class = "selected";
+      select_shape_con.classList.toggle("selected");
+      console.log("before");
+      select_shape_con = document.getElementById("region_shape_rect");
+      console.log(select_shape_con);
+      console.log("after");
+      reload_shape_division();
+      // console.log(select_shape_con.class);
+      // console.log("selected the rectangle region");
+      
+      // _redraw_reg_canvas();
+      // _reg_canvas.focus();
       del_sel_and_toggle_regions();
+      
     }
   }
 }
@@ -4379,11 +4403,14 @@ function toggle_attributes_input_panel() {
 
 function toggle_reg_attr_panel() {
 
-  for ( var shape_name in _REGION_SHAPE ) {
-      var ui_element = document.getElementById('region_shape_' + _REGION_SHAPE[shape_name]);
-      ui_element.classList.remove('selected');
+  if(!_is_reg_attr_panel_visible){
+    for ( var shape_name in _REGION_SHAPE ) {
+        var ui_element = document.getElementById('region_shape_' + _REGION_SHAPE[shape_name]);
+        ui_element.classList.remove('selected');
+    }
+     _current_shape = "";
   }
-  _current_shape = "";
+ 
   if ( _current_image_loaded ) {
     // var panel = document.getElementById('reg_attr_panel_button');
     // panel.classList.toggle('active');
