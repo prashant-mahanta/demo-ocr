@@ -1,0 +1,46 @@
+#popup_panel {
+	margin-top: 2%;
+	display: none;
+}
+
+.popup {
+	margin: 2%;
+	width: 20%;
+}
+
+ul li button {
+	font-size: 14px;
+	float: left;
+	margin-top: 5%;
+
+}
+
+#reg_head {
+	background-color: black;
+	color: white;
+	text-align: center;
+	padding: 5px;
+	margin-left: 30%;
+	margin-right: 30%;
+	margin-top: 0%;
+}
+
+button {
+	background-color: black;
+	color: white;
+}
+
+button:hover {
+	background-color: #999999;
+	color: black;
+}
+
+#reg_area {
+	width: 100%;
+	height: 50%;
+}
+
+#second_half {
+	margin-top: 3%;
+	margin-right: 14%;
+}

@@ -53,6 +53,7 @@ function populate_pre_defined_regions() {
 	regions_div = document.createElement("div");
 	regions_div.setAttribute("id", "region_area");
 	let heading = document.createElement("h1");
+	heading.setAttribute("id", "reg_head");
 	heading.innerHTML = "Regions";
 
 	list = document.createElement("ul");
@@ -82,16 +83,19 @@ function populate_pre_defined_regions() {
 	let new_region = document.createElement("button");
 	new_region.setAttribute("type", "btn btn-primary");
 	new_region.setAttribute("onclick", "show_popup()");
+	new_region.style = "margin-left: 4%;";
 	new_region.innerHTML = "Add New Region";
 
 	let rm_new_region = document.createElement("button");
 	rm_new_region.setAttribute("type", "btn btn-primary");
 	rm_new_region.setAttribute("onclick", "remove_popup()");
+	rm_new_region.style = "margin-left: 10px;";
 	rm_new_region.innerHTML = "Remove";
 
 	let export_region = document.createElement("button");
 	export_region.setAttribute("type", "btn btn-primary");
 	export_region.setAttribute("onclick", "export_data()");
+	export_region.style = "margin-left: 10px;";
 	export_region.innerHTML = "EXPORT";
 
 	regions_div.appendChild(heading);
@@ -128,10 +132,24 @@ function export_data(){
 		}
 	}
 	// alert(JSON.stringify(data));
+	// return JSON.stringify(data);
 	var all_region_data = [JSON.stringify(data)];
   	var blob_attr = {type: 'text/json;charset=utf-8'};
   	var all_region_data_blob = new Blob(all_region_data, blob_attr);
   	save_data_to_local_file(all_region_data_blob, "Regions.json");
+}
+
+function get_data(){
+	data = {region:[]};
+	for(var i=0; i<region_json["region"].length; i++) {
+		var name = region_json["region"][i]["region_name"];
+		var check = document.getElementById(name);
+		if(check.checked){
+			data["region"].push(region_json["region"][i]);
+		}
+	}
+	// alert(JSON.stringify(data));
+	return JSON.stringify(data);
 }
 
 function show_popup() {
@@ -181,7 +199,7 @@ function create_popup() {
 
 	var first_half_div = document.createElement("div");
 	first_half_div.setAttribute("id", "first_half");
-	first_half_div.setAttribute("style","width: 600px; float: left;");
+	first_half_div.setAttribute("style","width: 50%; float: left;");
 
 	let name_div = document.createElement("div");
 	name_div.setAttribute("class", "popup");
@@ -236,7 +254,7 @@ function create_popup() {
 	// second half
 	var second_half_div = document.createElement("div");
 	second_half_div.setAttribute("id", "second_half");
-	second_half_div.setAttribute("style", "margin-left: 620px;")
+	second_half_div.setAttribute("style", "margin-left: 0px;")
 	division.appendChild(first_half_div);
 	division.appendChild(second_half_div);
 	var region_area = document.getElementById("region_area");
@@ -262,7 +280,8 @@ function add_new_region() {
 		for (var i=1; i<=attr_count; i++){
 			var attr = {};
 			var attr_name = document.getElementById("attr_name_"+i).value;
-			if(attr_name){
+			// console.log(attr_name);
+			if(attr_name!=""){
 				var attr_type = document.getElementById("attr_type_"+i);
 				if (attr_type.checked == true) {
 					attr["att_name"] = attr_name;
@@ -302,7 +321,7 @@ function fill_earlier_attributes(value) {
 		if(region_json["region"][i]["region_name"] === value){
 			
 			for (var j=0; j<region_json["region"][i]["region_attributes"].length; j++){
-				console.log("fill ");
+				// console.log("fill ");
 				edit_attribute(region_json["region"][i]["region_attributes"][j]["att_name"], region_json["region"][i]["region_attributes"][j]["att_type"]);
 			}
 		}
@@ -320,7 +339,7 @@ function edit_attribute(value, att_type) {
 		check.checked = true;
 	else
 		check.checked = false;
-	console.log(second);
+	// console.log(second);
 }
 
 function removeAttr(id) {
@@ -446,7 +465,8 @@ function change_region_details(){
 		for (var i=1; i<=attr_count; i++){
 			var attr = {};
 			var attr_name = document.getElementById("attr_name_"+i);
-			if(attr_name){
+			// console.log(attr_name);
+			if(attr_name.value!==""){
 				attr_name = attr_name.value;
 				var attr_type = document.getElementById("attr_type_"+i);
 				if (attr_type.checked == true) {

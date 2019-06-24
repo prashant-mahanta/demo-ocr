@@ -1,695 +1,4 @@
-<!DOCTYPE html>
-Some of the code modules are taken from Abhishek Dutta's codebase.
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Layout Analysis Tool</title>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <!-- CSS style definition -->
-    <style type="text/css">
-      body {
-      min-width: 800px;
-      padding: 0;
-      margin: 0;
-      font-family: sans-serif;
-      }
-
-      /* Top panel : #navbar, #toolbar */
-      .top_panel {
-      position: fixed;
-      top: 0;
-      left: 0;
-      display: block;
-      font-size: medium;
-      background-color: #000000;
-      color: white;
-      z-index: 10;
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      }
-
-      .navbar {
-      display: inline-block;
-      }
-      .navbar ul {
-      display: inline;
-      list-style-type: none;
-      overflow: hidden;
-      }
-      .navbar li {
-      float: left;
-      }
-      .navbar li a, .drop_menu_item {
-      display: inline-block;
-      color: white;
-      padding: 0.65em 1.2em;
-      text-decoration: none;
-      }
-      .navbar li a:hover, .dropdown:hover {
-      background-color: #999999;
-      cursor: pointer;
-      }
-      .navbar li.dropdown {
-      display: inline-block;
-      }
-      .navbar .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #333333;
-      min-width: 120px;
-      border: 1px solid #ffffff;
-      font-size: small;
-      }
-      .navbar .dropdown-content a {
-      color: #ffffff;
-      padding: 0.4em 0.6em;
-      text-decoration: none;
-      display: block;
-      text-align: left;
-      background-color: #333333;
-      float: none;
-      }
-      .navbar .dropdown-content a:hover {
-      background-color: #000000;
-      color: #ffff00;
-      }
-      .navbar .dropdown:hover .dropdown-content {
-      display: block;
-      }
-
-      .toolbar {
-      display: inline-block;
-      color: white;
-      vertical-align: top;
-      }
-      .toolbar ul {
-      display: inline;
-      list-style-type: none;
-      overflow: hidden;
-      }
-      .toolbar li {
-      font-size: medium;
-      float: left;
-      padding: 0.65em 0.3em;
-      color: white;
-      }
-      .toolbar li:hover {
-      background-color: #333333;
-      color: red;
-      cursor: pointer;
-      }
-
-      #fileinfo {
-      font-size: small;
-      padding: 1.2em 0.8em;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      }
-
-      /* Middle panel: containing #image_panel, #leftsidebar */
-      .middle_panel {
-      position: relative;
-      display: table;
-      table-layout: fixed;
-      width: 100%;
-      z-index: 1;
-      padding: 0;
-      top: 3.5em;
-      /*padding-top: 1.0125em;  ensures the mouse event (x,y) coordinates are integer */
-      }
-      .box {
-      display: inline-block;
-      height: 20px;
-      width: 20px;
-      border: 2px solid;
-      }
-      #leftsidebar {
-      display: table-cell;
-      width: 250px;
-      z-index: 10;
-      vertical-align: top;
-      }
-      #display_area {
-      display: table-cell;
-      width: 100%;
-      z-index: 1;
-      margin: 0;
-      padding-left: 1em;
-      vertical-align: top;
-      }
-      #canvas_panel {
-      position: relative;
-      margin: 0;
-      padding: 0;
-      }
-      #leftsidebar_collapse_panel {
-      display: table-cell;
-      position: relative;
-      width: 10px;
-      z-index: 1;
-      vertical-align: top;
-      font-size: small;
-      }
-      #leftsidebar_collapse_button {
-      background-color: black;
-      width: 10px;
-      height: 25px;
-      color: white;
-      padding: 0.2em;
-      border-radius: 0px 5px 5px 0px;
-      font-size: large;
-      }
-      #leftsidebar_collapse_button:hover {
-      color: red;
-      cursor: pointer;
-      }
-
-      /* Left sidebar accordion */
-      button.leftsidebar_accordion {
-      font-size: large;
-      background-color: #f2f2f2;
-      cursor: pointer;
-      padding: 0.5em 0.5em;
-      width: 100%;
-      text-align: left;
-      border: 0;
-      outline: none;
-      }
-      button.leftsidebar_accordion:focus {
-      outline: none;
-      }
-      button.leftsidebar_accordion.active, button.leftsidebar_accordion:hover {
-      background-color: #e6e6e6;
-      }
-      button.leftsidebar_accordion:after {
-      content: '\02795';
-      color: #4d4d4d;
-      float: right;
-      }
-      button.leftsidebar_accordion.active:after {
-      content: '\2796';
-      }
-      .leftsidebar_accordion_panel {
-      display: none;
-      padding-top: 0;
-      padding-left: 0.5em;
-      font-size: small;
-      border-right: 2px solid #f2f2f2;
-      border-bottom: 2px solid #f2f2f2;
-      }
-      .leftsidebar_accordion_panel.show {
-      display: block;
-      }
-
-      /* Region shape selection panel inside leftsidebar */
-      ul.region_shape {
-      font-size: xx-large;
-      list-style-type: none;
-      overflow: hidden;
-      padding: 0.4em 0;
-      margin: 0;
-      }
-      ul.region_shape li{
-      float: left;
-      padding: 0 0.2em;
-      fill: #ffffff;
-      stroke: #000000;
-      }
-      ul.region_shape li:hover {
-      cursor: pointer;
-      fill: #ffffff;
-      stroke: #ff0000;
-      }
-      ul.region_shape .selected {
-      fill: #ffffff;
-      stroke: #ff0000;
-      }
-
-      /* Loaded image list shown in leftsidebar panel */
-      #img_list_panel {
-      display: none;
-      height: 0;
-      font-size: small;
-      overflow: scroll;
-      }
-      #img_list_panel ul {
-      position: relative;
-      line-height: 1.3em;
-      padding-left: 0;
-      list-style-type: none;
-      }
-      #img_list_panel li {
-      white-space: nowrap;
-      }
-      #img_list_panel li:hover {
-      background-color: #cccccc;
-      color: #000000;
-      cursor: pointer;
-      }
-
-      #message_panel {
-      position: fixed;
-      left: 0;
-      bottom: 0px;
-      line-height: 3em;
-      width: 100%;
-      background-color: #000000;
-      color: #ffff00;
-      font-size: small;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      z-index: 1000;
-      }
-
-      #invisible_file_input {
-      width: 0.1px;
-      height: 0.1px;
-      opacity: 0;
-      overflow: hidden;
-      position: absolute;
-      z-index: -1;
-      }
-
-      .text_panel {
-      display: none;
-      margin: auto;
-      font-size: medium;
-      line-height: 1.3em;
-      margin: 0;
-      max-width: 700px;
-      }
-      .text_panel li {
-      margin: 1em 0;
-      text-align: left;
-      }
-      .text_panel p {
-      text-align: left;
-      }
-
-      .action_text_link {
-      background-color: #aaeeff;
-      color: #000000;
-      }
-      .action_text_link:hover {
-      cursor: pointer;
-      }
-
-      .svg_button:hover {
-      cursor: pointer;
-      }
-
-      .tool_button {
-      color: blue;
-      cursor: pointer;
-      }
-      .tool_button:hover {
-      color: red;
-      }
-
-      /* region and file attributes input panel (spreadsheet like) */
-      #attributes_panel {
-      display: none;
-      position: fixed;
-      bottom: 0;
-      z-index: 10;
-      width: 100%;
-      max-height: 30%;
-      overflow: auto;
-      background-color: #ffffff;
-      border-top: 4px solid #000000;
-      padding: 0em 0em;
-      padding-bottom: 2em;
-      font-size: small;
-      }
-      #attributes_panel table {
-      border-collapse: collapse;
-      table-layout: fixed;
-      margin: 1em;
-      margin-bottom: 2em;
-      }
-
-      #attributes_panel td {
-      border: 1px solid #999999;
-      padding: 1em 1em;
-      margin: 0;
-      height: 1em;
-      white-space: nowrap;
-      vertical-align: top;
-      }
-      #attributes_panel tr:first-child td, #attributes_panel td:first-child {
-      padding: 1em 1em;
-      text-align: center;
-      }
-      #attributes_panel input {
-      border: none;
-      padding: 0;
-      margin: 0;
-      display: table-cell;
-      height: 1.3em;
-      font-size: small;
-      background-color: #ffffff;
-      vertical-align: top;
-      }
-      #attributes_panel input:hover {
-      background-color: #e6e6e6;
-      }
-      #attributes_panel input:focus {
-      background-color: #e6e6e6;
-      }
-      #attributes_panel input:not(:focus) {
-      text-align: center;
-      }
-      #attributes_panel textarea {
-      border: none;
-      padding: 0;
-      margin: 0;
-      display: table-cell;
-      font-size: small;
-      background-color: #ffffff;
-      }
-      #attributes_panel textarea:hover {
-      background-color: #e6e6e6;
-      }
-      #attributes_panel textarea:focus {
-      background-color: #e6e6e6;
-      }
-
-      #attributes_panel_toolbar {
-      display: block;
-      height: 30px;
-      width: 100%;
-      position: relative;
-      padding: 0;
-      margin: 0;
-      }
-      .attributes_panel_button {
-      width: 10px;
-      color: black;
-      font-size: x-large;
-      margin-left: 0.5em;
-      padding: 0;
-      }
-      .attributes_panel_button:hover {
-      color: red;
-      cursor: pointer;
-      }
-
-      /* layers of canvas */
-      #image_panel {
-      position: relative;
-      display: inline-block;
-      margin: auto;
-      margin-top: 1em;
-      }
-      #image_canvas {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      z-index: 1;
-      }
-      #region_canvas {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      z-index: 2;
-      }
-      /* Loading spinbar */
-      .loading_spinbox {
-      display: inline-block;
-      border: 0.4em solid #cccccc;
-      border-radius: 50%;
-      border-top: 0.4em solid #000000;
-      -webkit-animation: spin 2s linear infinite;
-      animation: spin 2s linear infinite;
-      }
-      @-webkit-keyframes spin {
-      0% { -webkit-transform: rotate(0deg); }
-      100% { -webkit-transform: rotate(360deg); }
-      }
-      @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-      }
-      /* The Modal (background) */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-
-/* Modal Content/Box */
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
-}
-
-/* The Close Button */
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-    </style>
-  </head>
-
-  <body onload="_init()" onresize="_update_ui_components()">
-    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-      <defs>
-        <symbol id="shape_rectangle">
-          <title>Rectangular region shape</title>
-          <rect width="20" height="12" x="6" y="10" stroke-width="2"/>
-        </symbol>
-        <symbol id="shape_circle">
-          <title>Circular region shape</title>
-          <circle r="10" cx="16" cy="16" stroke-width="2"/>
-        </symbol>
-        <symbol id="shape_ellipse">
-          <title>Elliptical region shape</title>
-          <ellipse rx="12" ry="8" cx="16" cy="16" stroke-width="2"/>
-        </symbol>
-        <symbol id="shape_polygon">
-          <title>Polyline region shape</title>
-          <path d="M 15.25,2.2372 3.625,11.6122 6,29.9872 l 20.75,-9.625 2.375,-14.75 z" stroke-width="2"/>
-        </symbol>
-      </defs>
-    </svg>
-
-    <div class="top_panel" id="ui_top_panel">
-      <!-- Navigation menu -->
-      <div class="navbar">
-        <ul>
-          <li><a onclick="show_home_panel()" title="Home">Home</a></li>
-          <li class="dropdown"><a title="Image" class="drop_menu_item">Image &#9662;</a>
-            <div class="dropdown-content">
-              <a onclick="sel_local_images()" title="Load (or add) a set of images from local disk">Load or Add Images</a>
-              <a onclick="show_img_list()" title="Browse currently loaded images">List Images</a>
-            </div>
-          </li>
-          <li class="dropdown"><a title="Annotations" class="drop_menu_item">Annotation &#9662;</a>
-            <div class="dropdown-content">
-              <a onclick="sel_local_data_file('annotations')" title="Import existing region data from CSV or JSON file">Import</a>
-              <a onclick="download_all_region_data('csv')" title="Save image region annotations as a CSV(comma separated value) file">Save as CSV</a>
-              <a onclick="download_all_region_data('json')" title="Save image region annotations as a JSON(Javascript Object Notation) file">Save as JSON</a>
-              <a onclick="show_annotation_data()" title="View annotations">View annotations</a>
-            </div>
-          </li>
-          <li class="dropdown"><a title="View" class="drop_menu_item">View &#9662;</a>
-            <div class="dropdown-content">
-              <a onclick="toggle_leftsidebar()" title="Show/hide left sidebar">Show/hide left sidebar</a>
-              <a onclick="toggle_region_boundary_visibility()" title="Show or hide region boundaries">Show/hide region boundaries</a>
-              <a onclick="toggle_region_id_visibility()" title="Show or hide region labels">Show/hide region labels</a>
-            </div>
-          </li>
-          <li class="dropdown"><a title="Change Region" class="drop_menu_item">Change Region &#9662;</a>
-            <div class="dropdown-content" id="region_dropdown">
-              <!-- <a onclick="change_region_text()" title="Change Region type to Text">Text</a>
-              <a onclick="change_region_graphic()" title="Change Region type to Graphic">Graphic</a>
-              <a onclick="change_region_equation()" title="Change Region type to Equation">Equation</a>
-              <a onclick="change_region_title()" title="Change Region type to Title">Title</a> -->
-            </div>
-          </li>
-          <!-- <li><a onclick="display_add_region_popup()" title="New Region">New Region</a></li> -->
-          {% if user.usertype == 0 %}
-            <li><a href="/all-labs/" title="Labs">Labs</a></li>
-          {% else %}
-            <li><a href="/lab/{{project.lab_id.id}}" title="Projects">Projects</a></li>
-          {% endif %}
-          <li><a onclick="save_state()" title="Save">Save</a></li>
-          <li><a href="/logout/" title="Logout">Logout</a></li>
-
-          <!-- The Modal -->
-<div id="myModal" class="modal">
-
-  <!-- Modal content -->
-  <div class="modal-content">
-    <span class="close">&times;</span>
-   
-    <!-- <form action="#" onsubmit="return validateFormOnSubmit(this);"> -->
-      <p style="color:black;">Region Name : </p><input type="text" name="region_name" value= "region name" id="region_name" value=""><br>
-      <input type="color" id="region_color" name="region_color"
-           value="#e66465">
-    <label for="head">Head</label>
-      <input type="submit" value="Submit" onclick="validateFormOnSubmit()">
-      <!-- </form> -->
-   <!-- <input type="text" name="fname"><br> -->
-  </div>
-
-</div>
-        </ul>
-
-      </div> <!-- end of #navbar -->
-
-      <!-- Shortcut toolbar -->
-      <div class="toolbar">
-        <ul>
-          <!--
-          <li onclick="sel_local_images()" title="Load or Add Images">&ctdot;</li>
-          <li onclick="sel_local_data_file('annotations')" title="Import Annotations">&uarr;</li>
-          <li onclick="download_all_region_data('csv')" title="Save Annotations (as CSV)">&DownArrowBar;</li>
-          -->
-
-          <li id="toolbar_prev_img" style="margin-left: 1em;" onclick="move_to_prev_image()" title="Previous Image">&larr;</li>
-          <li id="toolbar_next_img" onclick="move_to_next_image()" title="Next Image">&rarr;</li>
-          <li id="toolbar_list_img" onclick="toggle_img_list()" title="List Images">&#9776;</li>
-
-          <li id="toolbar_zoom_out" style="margin-left: 2em;" onclick="zoom_out()" title="Zoom Out">&minus;</li>
-          <li id="toolbar_zoom_in" onclick="zoom_in()" title="Zoom In">&plus;</li>
-          <li id="toolbar_zoom_reset" onclick="reset_zoom_level()" title="Zoom Reset">&equals;</li>
-
-          <!--<li id="toolbar_copy_region" style="margin-left: 2em;" onclick="copy_sel_regions()" title="Copy Region">c</li>
-          <li id="toolbar_paste_region" onclick="paste_sel_regions()" title="Paste Region">v</li>
-          <li id="toolbar_sel_all_region" onclick="sel_all_regions()" title="Select All Regions">a</li>-->
-          <li id="toolbar_del_region" onclick="del_sel_regions()" title="Delete Region">&times;</li>
-        </ul>
-      </div> <!-- endof #toolbar -->
-      <input type="file" id="invisible_file_input" multiple name="files[]" style="display:none">
-    </div> <!-- endof #top_panel -->
-
-    <!-- Middle Panel contains a left-sidebar and image display areas -->
-    <div class="middle_panel">
-      <div id="leftsidebar">
-        <button onclick="toggle_accordion_panel(this)" class="leftsidebar_accordion active">Region Shape</button>
-        <div class="leftsidebar_accordion_panel show" id="accordion_region_shape_panel">
-          <ul class="region_shape">
-            <li id="region_shape_rect" class="selected" onclick="select_region_shape('rect')" title="Rectangle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_rectangle"></use></svg></li>
-            <li id="region_shape_circle" onclick="select_region_shape('circle')" title="Circle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_circle"></use></svg></li>
-            <li id="region_shape_ellipse" onclick="select_region_shape('ellipse')" title="Ellipse"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_ellipse"></use></svg></li>
-            <li id="region_shape_polygon" onclick="select_region_shape('polygon')" title="Polygon"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_polygon"></use></svg></li>
-            <li id="region_shape_point" onclick="select_region_shape('point')" title="Point"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_point"></use></svg></li>
-          </ul>
-        </div>
-
-        <button onclick="toggle_img_list(this)" class="leftsidebar_accordion" id="loaded_img_panel">Loaded Images</button>
-        <div class="leftsidebar_accordion_panel" id="img_list_panel"></div>
-
-        <button onclick="toggle_reg_attr_panel()" class="leftsidebar_accordion" id="reg_attr_panel_button">Region Attributes</button>
-        <div id="legend">
-        </div>
-
-        <!--<button onclick="toggle_file_attr_panel()" class="leftsidebar_accordion" id="file_attr_panel_button">File Attributes</button>
-      
-        <button onclick="toggle_accordion_panel(this)" class="leftsidebar_accordion">Keyboard Shortcuts</button>-->
-        <div class="leftsidebar_accordion_panel">
-          <table style="padding: 2em 0em;">
-            <tr>
-              <td style="width: 6em;">n/p (&larr;/&rarr;)</td>
-              <td>Next/Previous image</td>
-            </tr>
-            <tr>
-              <td>+&nbsp;/&nbsp;-&nbsp;/&nbsp;=</td>
-              <td>Zoom in/out/reset</td>
-            </tr>
-            <tr>
-              <td>Ctrl + c</td>
-              <td>Copy sel. regions</td>
-            </tr>
-            <tr>
-              <td>Ctrl + v</td>
-              <td>Paste sel. regions</td>
-            </tr>
-            <tr>
-              <td>Ctrl + a</td>
-              <td>Select all regions</td>
-            </tr>
-            <tr>
-              <td>Del, Bkspc</td>
-              <td>Delete image region</td>
-            </tr>
-            <tr>
-              <td>Esc</td>
-              <td>Cancel operation</td>
-            </tr>
-            <tr>
-              <td>Ctrl + s</td>
-              <td>Download annotations</td>
-            </tr>
-            <tr>
-              <td>Spacebar</td>
-              <td>Toggle image list</td>
-            </tr>
-          </table>
-
-        </div>
-
-      </div> <!-- end of leftsidebar -->
-      <div id="leftsidebar_collapse_panel">
-        <div onclick="toggle_leftsidebar()" id="leftsidebar_collapse_button" title="Show/hide left toolbar">
-          &ltrif;</div>
-      </div>
-
-      <!-- Main display area: contains image canvas, ... -->
-      <div id="display_area">
-        <div id="canvas_panel">
-          <canvas id="image_canvas"></canvas>
-          <canvas id="region_canvas">Sorry, your browser does not support HTML5 Canvas functionality which is required for this application.</canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- region and file attributes input panel -->
-    <div id="attributes_panel">
-      <div id="attributes_panel_toolbar">
-        <div onclick="toggle_attributes_input_panel()" class="attributes_panel_button">&times;</div>
-      </div>
-      <table id="attributes_panel_table"></table>
-    </div>
-
-    <!-- to show status messages -->
-    <div id="message_panel"></div>
-
-    <!-- this vertical spacer is needed to allow scrollbar to show
-         items like Keyboard Shortcut hidden under the attributes panel -->
-    <div style="width: 100%;" id="vertical_space"></div>
-
-    <script type="text/javascript">
-
-
-"use strict";
+'use strict';
 
 var _REGION_SHAPE = { RECT:'rect',
                          CIRCLE:'circle',
@@ -702,6 +11,8 @@ var _ZONE_TYPE = { TEXT:'text',
                          HEADING:'heading',
                          TITLE:'title',
                          SUBTITLE:'subtitle'};
+
+var _selected_while_input;
 
 var _REGION_EDGE_TOL           = 5;   // pixel
 var _REGION_CONTROL_POINT_SIZE = 2;
@@ -731,6 +42,7 @@ var _CSV_KEYVAL_SEP = ':';
 var _IMPORT_CSV_COMMENT_CHAR = '#';
 
 var _img_metadata = {};   // data structure to store loaded images metadata
+var _img_region_id = 1;
 var _img_count    = 0;    // count of the loaded images
 var _canvas_regions = []; // image regions spec. in canvas space
 var _canvas_scale   = 1.0;// current scale of canvas image
@@ -745,10 +57,10 @@ var _current_image_width;
 var _current_image_height;
 
 // image canvas
-var _img_canvas = document.getElementById("image_canvas");
-var _img_ctx    = _img_canvas.getContext("2d");
-var _reg_canvas = document.getElementById("region_canvas");
-var _reg_ctx    = _reg_canvas.getContext("2d");
+var _img_canvas ;//= document.getElementById("image_canvas");
+var _img_ctx   ;//= _img_canvas.getContext("2d");
+var _reg_canvas ;//= document.getElementById("region_canvas");
+var _reg_ctx    ;//= _reg_canvas.getContext("2d");
 var _canvas_width, _canvas_height;
 
 // canvas zoom
@@ -780,8 +92,11 @@ var _cur_region_id               = 0;
 var _cur_reg_drawing_id          = -1;
 var nested_region_id             = -1;
 
+var _is_region_shape_list_visible = true;
+var region_shape_list = document.getElementById("accordion_region_shape_panel");
+
 // region
-var _current_shape             = _REGION_SHAPE.RECT;
+var _current_shape    ;//         = _REGION_SHAPE.RECT;
 var _current_polygon_region_id = -1;
 var _user_sel_region_id        = -1;
 var _click_x0 = 0; var _click_y0 = 0;
@@ -801,6 +116,8 @@ var _current_update_region_id      = -1;
 var _file_attributes               = {};
 var _visible_attr_name             = '';
 var _current_type                  = 'text';
+var attributes_values              = {};
+
 
 // persistence to local storage
 var _is_local_storage_available = false;
@@ -814,9 +131,8 @@ var _loaded_img_file_attr_miss_count = [];
 var _loaded_img_table_html = [];
 
 //Legend to identify types of B.box
-// var legendList = {text: '#66ff99',graphic: '#ff0000', equation: '#0000ff', title: '#ffff00' };
 var legendList = {};
-
+// var _region_attributes  = {};
 
 // UI html elements
 var invisible_file_input = document.getElementById("invisible_file_input");
@@ -838,6 +154,10 @@ var BBOX_BOUNDARY_FILL_COLOR_NEW       = "#aaeeff";
 var BBOX_BOUNDARY_LINE_COLOR           = "#1a1a1a";
 var BBOX_SELECTED_FILL_COLOR           = "#ffffff";
 
+
+// User DIVs stored here
+var label_id;
+var legendListDesc = {};
 //
 // Data structure for annotations
 //
@@ -854,20 +174,25 @@ function ImageRegion() {
   this.is_user_selected  = false;
   this.shape_attributes  = {}; // region shape attributes
   this.region_attributes = {}; // region attributes
+  this.image_region_id = _img_region_id;
+  // console.log("image region id: " + _img_region_id);
+  _img_region_id++;
 }
 
-function populate_region_list(legendList) {
-    var container = document.getElementById('legend');
+function populate_region_list(legendList, label_id) {
+  // console.log(label_id)
+    var container = document.getElementById(label_id);
     var dropdown_container = document.getElementById('region_dropdown');
+
     container.innerHTML = "";
     dropdown_container.innerHTML = "";
-  
+
     for (var key in legendList) {
       //populating legend with colors
         var boxContainer = document.createElement("DIV");
         var box = document.createElement("DIV");
         var label = document.createElement("SPAN");
-
+        boxContainer.setAttribute('title', legendListDesc[key]);
         label.innerHTML = key;
         box.className = "box";
         box.style.backgroundColor = legendList[key];
@@ -877,12 +202,15 @@ function populate_region_list(legendList) {
         container.appendChild(boxContainer);
 
 
-      //populating 'Change Region' dropdown 
+      //populating 'Change Region' dropdown
         var dropdown_item = document.createElement("a");
         // dropdown_item.onclick = function(key) { return function () {change_region(key)};}
         let new_key = key
-        dropdown_item.addEventListener('click', function (event) {
+        dropdown_item.addEventListener('click', function (e) {
           change_region(new_key);
+          if(!_is_reg_attr_panel_visible) {
+              toggle_reg_attr_panel();
+          }
          }, false);
         dropdown_item.innerHTML = key
         dropdown_container.appendChild(dropdown_item);
@@ -897,35 +225,356 @@ function populate_region_list(legendList) {
   //       });
 }
 
+function populate_shape_list(shapes, shape_id) {
+    var container = document.getElementById(shape_id);
+    var c = 0
+    // console.log("shape container:");
+    // console.log(container);
+    for (var key in shapes) {
+      //populating legend with colors
+      // console.log(shapes);
+        _REGION_SHAPE[ shapes[key]["region_shape"] ] = shapes[key]["code"];
+
+        var boxContainer = document.createElement("li");
+        boxContainer.setAttribute('title', shapes[key]["name"]);
+        boxContainer.setAttribute('id', 'region_shape_' + shapes[key]["code"]);
+        boxContainer.setAttribute('onclick', "select_region_shape('" + shapes[key]["code"] + "')");
+        // boxContainer.setAttribute('style', 'height=20; width=20');
+        if ( c == 0 ){
+          _current_shape = _REGION_SHAPE[shapes[key]["region_shape"]];
+          boxContainer.setAttribute('class', 'selected');
+        }
+        c++;
+        var box = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        box.setAttribute('height', '32');
+        box.setAttribute('viewbox', '0 0 32 32');
+        // box.setAttribute("x", "10");
+        // var box_inside = document.createElement("use");
+        // box_inside.setAttribute('xlink:href', '#shape_'+shapes[key]["name"]);
+
+        var useSVG = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        useSVG.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href', '#shape_'+shapes[key]["name"]);
+        // useSVG.setAttributeNS(null, 'height', '50');
+        // useSVG.setAttributeNS(null, 'width', '50');
+        // useSVG.setAttribute("y", "10");
+        // var shape = "<svg height='32' viewbox='0 0 32 32'><use xlink:href='#shape_"+shapes[key]["name"]+"'></use></svg>";
+        box.appendChild(useSVG);
+        boxContainer.appendChild(box);
+        // boxContainer.appendChild(box);
+        // boxContainer.appendChild(label);
+        // console.log("box container");
+        // console.log(boxContainer);
+        container.appendChild(boxContainer);
+        // console.log(container);
+
+   }
+
+
+}
+
 //
 // Initialization routine
 //
-function _init() {
-  show_home_panel();
-  // get all the labels and store in legendList
-  // console.log("{{project.id}}");
-  $.ajax({
-        type: "GET",
-        url : "/labels/{{project.lab_id.id}}/{{project.id}}/",
-        success : function (value) {
-          console.log(value);
-          for(var i in value){
-            var label = value[i].label_name;
-            console.log(label);
-            var col = value[i].color;
-            console.log(col);
-            legendList[label] = col;
-          }
 
-          console.log(legendList);
-          populate_region_list(legendList);
-        }
+function set_variables(){
+ _REGION_SHAPE = {};
 
-  }); 
+ _ZONE_TYPE = { TEXT:'text',
+                         GRAPHIC:'graphic',
+                         HEADING:'heading',
+                         TITLE:'title',
+                         SUBTITLE:'subtitle'};
 
+ _REGION_EDGE_TOL           = 5;   // pixel
+ _REGION_CONTROL_POINT_SIZE = 2;
+ _REGION_POINT_RADIUS       = 3;
+ _POLYGON_VERTEX_MATCH_TOL  = 5;
+ _REGION_MIN_DIM            = 3;
+ _MOUSE_CLICK_TOL           = 2;
+ _ELLIPSE_EDGE_TOL          = 0.2; // euclidean distance
+ _THETA_TOL                 = Math.PI/18; // 10 degrees
+ _POLYGON_RESIZE_VERTEX_OFFSET    = 100;
+ _CANVAS_DEFAULT_ZOOM_LEVEL_INDEX = 3;
+ _CANVAS_ZOOM_LEVELS = [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4, 5];
+
+ _THEME_REGION_BOUNDARY_WIDTH = 4;
+ _THEME_BOUNDARY_LINE_COLOR   = "#1a1a1a";
+ _THEME_BOUNDARY_FILL_COLOR   = "#aaeeff";
+ _THEME_SEL_REGION_FILL_COLOR = "#808080";
+ _THEME_SEL_REGION_FILL_BOUNDARY_COLOR = "#000000";
+ _THEME_SEL_REGION_OPACITY    = 0.5;
+ _THEME_MESSAGE_TIMEOUT_MS    = 2500;
+ _THEME_ATTRIBUTE_VALUE_FONT  = '10pt Sans';
+ _THEME_CONTROL_POINT_COLOR   = '#ff0000';
+
+ _CSV_SEP        = ',';
+ _CSV_QUOTE_CHAR = '"';
+ _CSV_KEYVAL_SEP = ':';
+ _IMPORT_CSV_COMMENT_CHAR = '#';
+
+ _img_metadata = {};   // data structure to store loaded images metadata
+ _img_region_id = 1;   // image id
+ _img_count    = 0;    // count of the loaded images
+ _canvas_regions = []; // image regions spec. in canvas space
+ _canvas_scale   = 1.0;// current scale of canvas image
+
+ _image_id_list  = []; // array of image id (in original order)
+ _image_id       = ''; // id={filename+length} of current image
+ _image_index    = -1; // index
+
+ _current_image_filename;
+ _current_image;
+ _current_image_width;
+ _current_image_height;
+
+// image canvas
+ _img_canvas = document.getElementById("image_canvas");
+ _img_ctx    = _img_canvas.getContext("2d");
+ _reg_canvas = document.getElementById("region_canvas");
+ _reg_ctx    = _reg_canvas.getContext("2d");
+ _canvas_width, _canvas_height;
+
+// canvas zoom
+ _canvas_zoom_level_index   = _CANVAS_DEFAULT_ZOOM_LEVEL_INDEX; // 1.0
+ _canvas_scale_without_zoom = 1.0;
+
+// state of the application
+ _is_user_drawing_region  = false;
+ _current_image_loaded    = false;
+ _is_window_resized       = false;
+ _is_user_resizing_region = false;
+ _is_user_moving_region   = false;
+ _is_user_drawing_polygon = false;
+ _is_region_selected      = false;
+ _is_all_region_selected  = false;
+ _is_user_updating_attribute_name  = false;
+ _is_user_updating_attribute_value = false;
+ _is_user_adding_attribute_name    = false;
+ _is_loaded_img_list_visible  = false;
+ _is_attributes_panel_visible = false;
+ _is_reg_attr_panel_visible   = false;
+ _is_file_attr_panel_visible  = false;
+ _is_canvas_zoomed            = false;
+ _is_loading_current_image    = false;
+ _is_region_id_visible        = true;
+ _is_region_boundary_visible  = true;
+ _is_ctrl_pressed             = false;
+ _cur_region_id               = 0;
+ _cur_reg_drawing_id          = -1;
+ nested_region_id             = -1;
+
+ _is_region_shape_list_visible = true;
+ region_shape_list = document.getElementById("accordion_region_shape_panel");
+// region
+ _current_shape     ;//        = _REGION_SHAPE.RECT;
+ _current_polygon_region_id = -1;
+ _user_sel_region_id        = -1;
+ _click_x0 = 0;  _click_y0 = 0;
+ _click_x1 = 0;  _click_y1 = 0;
+ _region_click_x, _region_click_y;
+ _copied_image_regions = [];
+ _region_edge          = [-1, -1];
+ _current_x = 0;  _current_y = 0;
+
+// message
+ _message_clear_timer;
+
+// attributes
+ _region_attributes             = {};
+ _current_update_attribute_name = "";
+ _current_update_region_id      = -1;
+ _file_attributes               = {};
+ _visible_attr_name             = '';
+ _current_type                  = 'text';
+ attributes_values              = {};
+
+// persistence to local storage
+ _is_local_storage_available = false;
+ _is_save_ongoing = false;
+
+// image list
+ _reload_img_table = true;
+ _loaded_img_fn_list = [];
+ _loaded_img_region_attr_miss_count = [];
+ _loaded_img_file_attr_miss_count = [];
+ _loaded_img_table_html = [];
+
+//Legend to identify types of B.box
+ legendList = {};
+ legendListDesc = {};
+ // _region_attributes  = {};
+
+// UI html elements
+ invisible_file_input = document.getElementById("invisible_file_input");
+ image_panel  = document.getElementById("image_panel");
+ ui_top_panel = document.getElementById("ui_top_panel");
+ canvas_panel = document.getElementById("canvas_panel");
+
+ annotation_list_snippet = document.getElementById("annotation_list_snippet");
+ annotation_textarea     = document.getElementById("annotation_textarea");
+
+ loaded_img_list_panel = document.getElementById('loaded_img_list_panel');
+ attributes_panel      = document.getElementById('attributes_panel');
+ annotation_data_window;
+
+ BBOX_LINE_WIDTH       = 4;
+ BBOX_SELECTED_OPACITY = 0.3;
+ BBOX_BOUNDARY_FILL_COLOR_ANNOTATED = "#f2f2f2";
+ BBOX_BOUNDARY_FILL_COLOR_NEW       = "#aaeeff";
+ BBOX_BOUNDARY_LINE_COLOR           = "#1a1a1a";
+ BBOX_SELECTED_FILL_COLOR           = "#ffffff";
+}
+
+function init_canvas(canvas_id, region_canvas_id){
+  // image canvas
+ _img_canvas = document.getElementById("image_canvas");
+ _img_ctx    = _img_canvas.getContext("2d");
+ _reg_canvas = document.getElementById("region_canvas");
+ _reg_ctx    = _reg_canvas.getContext("2d");
+ _canvas_width, _canvas_height;
+}
+
+function populate_attribute_position(attribute_id){
+
+  // <div onclick="toggle_attributes_input_panel()" class="attributes_panel_button">&times;</div>
+  var body = document.getElementById(attribute_id);
+  var boxContainer = document.createElement("div");
+  // boxContainer.setAttribute("onclick", "toggle_attributes_input_panel()");
+  boxContainer.setAttribute("onclick", "populate_popup()");
+  boxContainer.setAttribute("style", "width: 10px;color: black;font-size: x-large;margin-left: 0.5em;padding: 0;");
+  boxContainer.innerHTML = "&times;";
+  var center = document.createElement("center");
+  var warn = document.createElement("span");
+  warn.setAttribute("style", "color: red; font-size:18px; float: center;");
+  warn.innerHTML = "&#42; Required";
+  body.appendChild(boxContainer);
+  center.appendChild(warn);
+  body.appendChild(center);
+
+}
+
+function required_attributes_filled(){
+  // var seg_rel_list = [];
+  // for (var i in _img_metadata[_image_id].regions){
+  //   if ( _img_metadata[_image_id].regions[i].is_user_selected ){
+  //     seg_rel_list.push(i);
+  //   }
+  // }
+  // console.log(_img_metadata[_image_id].regions);
+  var type = _img_metadata[_image_id].regions[_selected_while_input].shape_attributes.type;
+
+  for (var col in _region_attributes[type] ){
+    var has = _img_metadata[_image_id].regions[_selected_while_input].region_attributes;
+    if(_region_attributes[type][col].att_type){
+      if(!has.hasOwnProperty(_region_attributes[type][col].att_name)){
+        return false;
+      }
+    }
+  }
+
+  return true;
+
+}
+
+function reload_shape_division(){
+  var shape = document.getElementById("region_shape_rect");
+  console.log(shape.class);
+  console.log(shape);
+}
+function populate_popup() {
+  //Check for condition
+  if(required_attributes_filled()){
+    
+    toggle_attributes_input_panel();
+    var select_shape_con = document.getElementById("region_shape_rect");
+    _current_shape = _REGION_SHAPE['RECT'];
+    select_shape_con.class = "selected";
+    select_shape_con.classList.toggle("selected");
+    reload_shape_division();
+    _redraw_reg_canvas();
+    _reg_canvas.focus();
+  }
+
+  else{
+
+    let container = document.getElementById("canvas_panel");
+    let _modal_ = document.createElement("DIV");
+    _modal_.setAttribute("id", "popup");
+    _modal_.style = "display: block; position: fixed; z-index: 5; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.8);"
+    let _modal_content = document.createElement("DIV");
+    _modal_content.setAttribute("id", "popup-content");
+    _modal_content.style = "background-color: rgb(245, 245, 245); margin: 10% auto; padding: 40px; border: 1px solid #888; width: 40%; height: 20%; color:red;";
+    _modal_content.innerHTML = "<p>Please enter the required (<b>*</b>) fields.</p>"
+    let _modal_btn = document.createElement("button");
+    _modal_btn.setAttribute("type", "btn btn-primary");
+    _modal_btn.innerHTML = "close";
+    _modal_btn.style.float = "right";
+    _modal_btn.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; float:right;";
+    let _modal_btn_2 = document.createElement("button");
+    _modal_btn_2.setAttribute("type", "btn btn-primary");
+    _modal_btn_2.innerHTML = "clear";
+    _modal_btn_2.style.float = "right";
+    _modal_btn_2.style = "font-size: 18px; margin-top: 60px; background-color: black; color: white; float: left";
+    _modal_content.appendChild(_modal_btn);
+    _modal_content.appendChild(_modal_btn_2);
+    _modal_.appendChild(_modal_content);
+    container.appendChild(_modal_);
+
+    _modal_btn.onclick = function(){
+      _modal_.style.display = "none";
+      // var select_shape_con = document.getElementById("region_shape_rect");
+      // _current_shape = _REGION_SHAPE['RECT'];
+      // select_shape_con.class = "selected";
+      reload_shape_division();
+    }
+    // remove all the selected areas
+    _modal_btn_2.onclick = function(){
+      _modal_.style.display = "none";
+      var select_shape_con = document.getElementById("region_shape_rect");
+      _current_shape = _REGION_SHAPE['RECT'];
+      console.log("current shape: " + _current_shape);
+      // select_shape_con.class = "selected";
+      select_shape_con.classList.toggle("selected");
+      console.log("before");
+      select_shape_con = document.getElementById("region_shape_rect");
+      console.log(select_shape_con);
+      console.log("after");
+      reload_shape_division();
+      // console.log(select_shape_con.class);
+      // console.log("selected the rectangle region");
+      
+      // _redraw_reg_canvas();
+      // _reg_canvas.focus();
+      del_sel_and_toggle_regions();
+      
+    }
+  }
+}
+
+
+function _init(event) {
+  show_body(event["container_id"]);
+  set_variables();
+  init_canvas("image_canvas", "region_canvas");
+  update_eventListeners();
   
-  // console.log("eandddd");
-  // populate_region_list(legendList);
+  
+  label_id = "legend";
+  show_home_panel();
+  var labels = event["region"];
+  var shapes = event["shapes"];
+  var shape_id = "accordion_region_shape_panel";
+
+  for (var i = 0; i < labels.length; i++) {
+    legendList[ labels[i]["region_name"] ] = labels[i]["region_color"];
+    legendListDesc[ labels[i]["region_name"] ] = labels[i]["region_description"];
+    _region_attributes[ labels[i]["region_name"]] = labels[i]["region_attributes"]
+  }
+  // console.log(legendList);
+  populate_region_list(legendList, label_id);
+  populate_shape_list(shapes, shape_id);
+  populate_attribute_position("attributes_panel_toolbar");
+
 
   _is_local_storage_available = check_local_storage();
   if (_is_local_storage_available) {
@@ -942,6 +591,218 @@ function _init() {
   }
 }
 
+function show_body(container_id){
+  var master = document.getElementById(container_id);
+  master.innerHTML = '<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\
+    <defs>\
+      <symbol id="shape_rectangle">\
+        <title>Rectangular region shape</title>\
+        <rect width="20" height="12" x="6" y="10" stroke-width="2"/>\
+      </symbol>\
+      <symbol id="shape_circle">\
+        <title>Circular region shape</title>\
+        <circle r="10" cx="16" cy="16" stroke-width="2"/>\
+      </symbol>\
+      <symbol id="shape_ellipse">\
+        <title>Elliptical region shape</title>\
+        <ellipse rx="12" ry="8" cx="16" cy="16" stroke-width="2"/>\
+      </symbol>\
+      <symbol id="shape_polygon">\
+        <title>Polyline region shape</title>\
+        <path d="M 15.25,2.2372 3.625,11.6122 6,29.9872 l 20.75,-9.625 2.375,-14.75 z" stroke-width="2"/>\
+      </symbol>\
+    </defs>\
+  </svg>\
+  \
+  <div class="top_panel" id="ui_top_panel">\
+    <!-- Navigation menu -->\
+    <div class="navbar">\
+      <ul>\
+        <li><a onclick="show_home_panel()" title="Home">Home</a></li>\
+        <li class="dropdown"><a title="Image" class="drop_menu_item">Image &#9662;</a>\
+          <div class="dropdown-content">\
+            <a onclick="sel_local_images()" title="Load (or add) a set of images from local disk">Load or Add Images</a>\
+            <a onclick="show_img_list()" title="Browse currently loaded images">List Images</a>\
+          </div>\
+        </li>\
+        <li class="dropdown"><a title="Annotations" class="drop_menu_item">Annotation &#9662;</a>\
+          <div class="dropdown-content">\
+            <a onclick="sel_local_data_file(\'annotations\')" title="Import existing region data from CSV or JSON file">Import</a>\
+            <a onclick="download_all_region_data(\'csv\')" title="Save image region annotations as a CSV(comma separated value) file">Save as CSV</a>\
+            <a onclick="download_all_region_data(\'json\')" title="Save image region annotations as a JSON(Javascript Object Notation) file">Save as JSON</a>\
+            <a onclick="show_annotation_data()" title="View annotations">View annotations</a>\
+          </div>\
+        </li>\
+        <li class="dropdown"><a title="View" class="drop_menu_item">View &#9662;</a>\
+          <div class="dropdown-content">\
+            <a onclick="toggle_leftsidebar()" title="Show/hide left sidebar">Show/hide left sidebar</a>\
+            <a onclick="toggle_region_boundary_visibility()" title="Show or hide region boundaries">Show/hide region boundaries</a>\
+            <a onclick="toggle_region_id_visibility()" title="Show or hide region labels">Show/hide region labels</a>\
+          </div>\
+        </li>\
+        <li class="dropdown"><a title="Change Region" class="drop_menu_item">Change Region &#9662;</a>\
+          <div class="dropdown-content" id="region_dropdown">\
+            <!-- <a onclick="change_region_text()" title="Change Region type to Text">Text</a>\
+            <a onclick="change_region_graphic()" title="Change Region type to Graphic">Graphic</a>\
+            <a onclick="change_region_equation()" title="Change Region type to Equation">Equation</a>\
+            <a onclick="change_region_title()" title="Change Region type to Title">Title</a> -->\
+          </div>\
+        </li>\
+        <li><a title="New Region">New Region</a></li>\
+        <!-- The Modal -->\
+<div id="myModal" class="modal">\
+\
+<!-- Modal content -->\
+<div class="modal-content">\
+  <span class="close">&times;</span>\
+\
+  <!-- <form action="#" onsubmit="return validateFormOnSubmit(this);"> -->\
+    <p style="color:black;">Region Name : </p><input type="text" name="region_name" placeholder= "region name" id="region_name" value="" required><br>\
+    <p style="color:black;">Region Description : </p><input type="text" name="region_desc" placeholder= "Region Description" id="region_desc" value="" required><br>\
+    <input type="color" id="region_color" name="region_color"\
+         value="#e66465">\
+  <label for="head">Head</label>\
+\
+    <input type="submit" value="Submit" onclick="validateFormOnSubmit({ region_name_id: \'region_name\', region_desc_id: \'region_desc\', region_color_id: \'region_color\'})">\
+    <!-- </form> -->\
+ <!-- <input type="text" name="fname"><br> -->\
+</div>\
+\
+</div>\
+      </ul>\
+\
+    </div> <!-- end of #navbar -->\
+\
+    <!-- Shortcut toolbar -->\
+    <div class="toolbar">\
+      <ul>\
+        <!--\
+        <li onclick="sel_local_images()" title="Load or Add Images">&ctdot;</li>\
+        <li onclick="sel_local_data_file(\'annotations\')" title="Import Annotations">&uarr;</li>\
+        <li onclick="download_all_region_data(\'csv\')" title="Save Annotations (as CSV)">&DownArrowBar;</li>\
+        -->\
+\
+        <li id="toolbar_prev_img" style="margin-left: 1em;" onclick="move_to_prev_image()" title="Previous Image">&larr;</li>\
+        <li id="toolbar_next_img" onclick="move_to_next_image()" title="Next Image">&rarr;</li>\
+        <li id="toolbar_list_img" onclick="toggle_img_list()" title="List Images">&#9776;</li>\
+\
+        <li id="toolbar_zoom_out" style="margin-left: 2em;" onclick="zoom_out()" title="Zoom Out">&minus;</li>\
+        <li id="toolbar_zoom_in" onclick="zoom_in()" title="Zoom In">&plus;</li>\
+        <li id="toolbar_zoom_reset" onclick="reset_zoom_level()" title="Zoom Reset">&equals;</li>\
+\
+        <!--<li id="toolbar_copy_region" style="margin-left: 2em;" onclick="copy_sel_regions()" title="Copy Region">c</li>\
+        <li id="toolbar_paste_region" onclick="paste_sel_regions()" title="Paste Region">v</li>\
+        <li id="toolbar_sel_all_region" onclick="sel_all_regions()" title="Select All Regions">a</li>-->\
+        <li id="toolbar_del_region" onclick="del_sel_regions()" title="Delete Region">&times;</li>\
+      </ul>\
+    </div> <!-- endof #toolbar -->\
+    <input type="file" id="invisible_file_input" multiple name="files[]" style="display:none">\
+  </div> <!-- endof #top_panel -->\
+\
+  <!-- Middle Panel contains a left-sidebar and image display areas -->\
+  <div class="middle_panel">\
+    <div id="leftsidebar">\
+      <button onclick="toggle_region_shape_list(this)" id= "region_shapes" class="leftsidebar_accordion active">Region Shape</button>\
+      <div class="leftsidebar_accordion_panel show" >\
+        <ul class="region_shape" id="accordion_region_shape_panel">\
+          <!-- <li id="region_shape_rect" class="selected" onclick="select_region_shape(\'rect\')" title="Rectangle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_rectangle"></use></svg></li> -->\
+\
+\
+          <!--\
+            <li id="region_shape_point" onclick="select_region_shape(\'point\')" title="Point"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_point"></use></svg></li>\
+\
+          <li id="region_shape_ellipse" onclick="select_region_shape(\'ellipse\')" title="Ellipse"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_ellipse"></use></svg></li>\
+          -->\
+          <!-- <li id="region_shape_polygon" onclick="select_region_shape(\'polygon\')" title="Polygon"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_polygon"></use></svg></li> -->\
+\
+\
+\
+          <!-- <li id="region_shape_circle" onclick="select_region_shape(\'circle\')" title="Circle"><svg height="32" viewbox="0 0 32 32"><use xlink:href="#shape_circle"></use></svg></li> -->\
+\
+        </ul>\
+      </div>\
+\
+      <button onclick="toggle_img_list(this)" class="leftsidebar_accordion" id="loaded_img_panel">Loaded Images</button>\
+      <div class="leftsidebar_accordion_panel" id="img_list_panel"></div>\
+\
+      <button class="leftsidebar_accordion" id="reg_attr_panel_button">Region</button>\
+      <div id="legend">\
+      </div>\
+      <!--<button onclick="toggle_file_attr_panel()" class="leftsidebar_accordion" id="file_attr_panel_button">File Attributes</button>\
+\
+      <button onclick="toggle_accordion_panel(this)" class="leftsidebar_accordion">Keyboard Shortcuts</button>-->\
+      <div class="leftsidebar_accordion_panel">\
+        <table style="padding: 2em 0em;">\
+          <tr>\
+            <td style="width: 6em;">n/p (&larr;/&rarr;)</td>\
+            <td>Next/Previous image</td>\
+          </tr>\
+          <tr>\
+            <td>+&nbsp;/&nbsp;-&nbsp;/&nbsp;=</td>\
+            <td>Zoom in/out/reset</td>\
+          </tr>\
+          <tr>\
+            <td>Ctrl + c</td>\
+            <td>Copy sel. regions</td>\
+          </tr>\
+          <tr>\
+            <td>Ctrl + v</td>\
+            <td>Paste sel. regions</td>\
+          </tr>\
+          <tr>\
+            <td>Ctrl + a</td>\
+            <td>Select all regions</td>\
+          </tr>\
+          <tr>\
+            <td>Del, Bkspc</td>\
+            <td>Delete image region</td>\
+          </tr>\
+          <tr> \
+            <td>Esc</td>\
+            <td>Cancel operation</td>\
+          </tr>\
+          <tr>\
+            <td>Ctrl + s</td>\
+            <td>Download annotations</td>\
+          </tr>\
+          <tr>\
+            <td>Spacebar</td>\
+            <td>Toggle image list</td>\
+          </tr>\
+        </table>\
+      </div>\
+\
+    </div> <!-- end of leftsidebar -->\
+    <div id="leftsidebar_collapse_panel">\
+      <div onclick="toggle_leftsidebar()" id="leftsidebar_collapse_button" title="Show/hide left toolbar">\
+        &ltrif;</div>\
+    </div>\
+\
+    <!-- Main display area: contains image canvas, ... -->\
+    <div id="display_area">\
+      <div id="canvas_panel">\
+        <canvas id="image_canvas"></canvas>\
+        <canvas id="region_canvas">Sorry, your browser does not support HTML5 Canvas functionality which is required for this application.</canvas>\
+      </div>\
+    </div>\
+  </div>\
+\
+  <!-- region and file attributes input panel -->\
+  <div id="attributes_panel">\
+    <div id="attributes_panel_toolbar">\
+      <!-- <div onclick="toggle_attributes_input_panel()" class="attributes_panel_button">&times;</div> -->\
+    </div>\
+    <table id="attributes_panel_table"></table>\
+  </div>\
+\
+  <!-- to show status messages -->\
+  <div id="message_panel"></div>\
+\
+  <!-- this vertical spacer is needed to allow scrollbar to show\
+       items like Keyboard Shortcut hidden under the attributes panel -->\
+  <div style="width: 100%;" id="vertical_space"></div>';
+}
+
 //
 // Handlers for top navigation bar
 //
@@ -953,7 +814,7 @@ function show_home_panel() {
     var start_info = '<p><a title="Load or Add Images" style="cursor: pointer; color: blue;" onclick="sel_local_images()">Load images</a> to start annotation or, see <a title="Getting started with  Image Annotator" style="cursor: pointer; color: blue;" onclick="show_getting_started_panel()">Getting Started</a>.</p>';
     clear_image_display_area();
     //document.getElementById('_start_info_panel').innerHTML = start_info;
-    //document.getElementById('_start_info_panel').style.display = 'block';
+    //document.getElementById('_start_info_panel_).style.display = 'block';
   }
 }
 function sel_local_images() {
@@ -1026,7 +887,7 @@ function set_all_text_panel_display(style_display) {
   }
 }
 function clear_image_display_area() {
-  hide_all_canvas();
+  // hide_all_canvas();
   set_all_text_panel_display('none');
 }
 
@@ -1607,38 +1468,43 @@ function _load_canvas_regions() {
 
 // updates currently selected region shape
 function select_region_shape(sel_shape_name) {
-  for ( var shape_name in _REGION_SHAPE ) {
-    var ui_element = document.getElementById('region_shape_' + _REGION_SHAPE[shape_name]);
-    ui_element.classList.remove('selected');
-  }
+  // console.log(sel_shape_name);
 
-  _current_shape = sel_shape_name;
-  var ui_element = document.getElementById('region_shape_' + _current_shape);
-  ui_element.classList.add('selected');
+  if (!_is_reg_attr_panel_visible){
+    for ( var shape_name in _REGION_SHAPE ) {
+      var ui_element = document.getElementById('region_shape_' + _REGION_SHAPE[shape_name]);
+      ui_element.classList.remove('selected');
+    }
 
-  switch(_current_shape) {
-  case _REGION_SHAPE.RECT: // Fall-through
-  case _REGION_SHAPE.CIRCLE: // Fall-through
-  case _REGION_SHAPE.ELLIPSE:
-    show_message('Press single click and drag mouse to draw ' +
-                 _current_shape + ' region');
-    break;
+    _current_shape = sel_shape_name;
+    var ui_element = document.getElementById('region_shape_' + _current_shape);
+    ui_element.classList.add('selected');
+  // console.log("switch");
+    switch(_current_shape) {
+    case _REGION_SHAPE.RECT: // Fall-through
+    case _REGION_SHAPE.CIRCLE: // Fall-through
+    case _REGION_SHAPE.ELLIPSE:
+      show_message('Press single click and drag mouse to draw ' +
+                   _current_shape + ' region');
+      break;
 
-  case _REGION_SHAPE.POLYGON:
-    _is_user_drawing_polygon = false;
-    _current_polygon_region_id = -1;
+    case _REGION_SHAPE.POLYGON:
+      _is_user_drawing_polygon = false;
+      _current_polygon_region_id = -1;
 
-    show_message('Press single click to define polygon vertices and ' +
-                 'click first vertex to close path');
-    break;
+      show_message('Press single click to define polygon vertices and ' +
+                   'click first vertex to close path');
+      break;
 
-  case _REGION_SHAPE.POINT:
-    show_message('Press single click to define points (or landmarks)');
-    break;
+    case _REGION_SHAPE.POINT:
+      show_message('Press single click to define points (or landmarks)');
+      break;
 
-  default:
-    show_message('Unknown shape selected!');
-    break;
+    default:
+      show_message('Unknown shape selected!');
+      break;
+    }
+    // console.log("selected");
   }
 }
 
@@ -1680,6 +1546,25 @@ function toggle_img_list(panel) {
     _is_loaded_img_list_visible = true;
     show_img_list();
   }
+}
+
+function toggle_region_shape_list(panel) {
+
+  if ( typeof panel === 'undefined' ) {
+    // invoked from accordion in the top navigation toolbar
+    panel = document.getElementById('region_shapes');
+  }
+  panel.classList.toggle('active');
+
+  if (_is_region_shape_list_visible) {
+    region_shape_list.style.display    = 'none';
+    _is_region_shape_list_visible = false;
+  } else {
+    region_shape_list.style.display    = 'block';
+    _is_region_shape_list_visible = true;
+    // show_img_list();
+  }
+
 }
 
 function show_img_list() {
@@ -1798,7 +1683,7 @@ function set_region_select_state(region_id, is_selected) {
 function toggle_accordion_panel(e) {
   /*e.classList.toggle('active');
   e.nextElementSibling.classList.toggle('show');*/
-  console.log("edit");
+  // console.log("edit");
 }
 
 function img_loading_spinbar(show) {
@@ -1831,9 +1716,18 @@ function show_annotation_data() {
   annotation_data_window.document.body.innerHTML = hstr;
 }
 
+
+function show_modal_for_attribute(){
+  // window.alert("Hi new region");
+}
+
+
+
 //
 // Image click handlers
 //
+
+function update_eventListeners(){
 
 // enter annotation mode on double click
 _reg_canvas.addEventListener('dblclick', function(e) {
@@ -1841,7 +1735,7 @@ _reg_canvas.addEventListener('dblclick', function(e) {
   var region_id = is_inside_region(_click_x0, _click_y0);
 
   if (region_id !== -1) {
-    // user clicked inside a region, show attribute panel
+    // user clicked inside a region, show attribute panel\
     if(!_is_reg_attr_panel_visible) {
       toggle_reg_attr_panel();
     }
@@ -1980,19 +1874,28 @@ _reg_canvas.addEventListener('mouseup', function(e) {
         _is_user_moving_region = false;
 
         _current_type = _img_metadata[_image_id].regions[_user_sel_region_id].shape_attributes.type;
-        switch(_current_type){
-        case 'text':
-          _THEME_SEL_REGION_FILL_COLOR = '#66ff99';
+
+
+      //   switch(_current_type){
+      //   case 'text':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#66ff99';
+      //     break;
+      //   case 'graphic':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#ff0000';
+      //     break;
+      //   case 'equation':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#0000ff';
+      //     break;
+      //   case 'title':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#ffff00';
+      //     break;
+      // }
+
+      for (var key in legendList){
+        if( _current_type === key){
+          _THEME_SEL_REGION_FILL_COLOR = legendList[key];
           break;
-        case 'graphic':
-          _THEME_SEL_REGION_FILL_COLOR = '#ff0000';
-          break;
-        case 'equation':
-          _THEME_SEL_REGION_FILL_COLOR = '#0000ff';
-          break;
-        case 'title':
-          _THEME_SEL_REGION_FILL_COLOR = '#ffff00';
-          break;
+        }
       }
 
         // de-select all other regions if the user has not pressed Shift
@@ -2213,19 +2116,26 @@ _reg_canvas.addEventListener('mouseup', function(e) {
       _current_type = _img_metadata[_image_id].regions[_user_sel_region_id].shape_attributes.type;
       }
       //console.log(_current_type);
-      switch(_current_type){
-        case 'text':
-          _THEME_SEL_REGION_FILL_COLOR = '#66ff99';
+      // switch(_current_type){
+      //   case 'text':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#66ff99';
+      //     break;
+      //   case 'graphic':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#ff0000';
+      //     break;
+      //   case 'equation':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#0000ff';
+      //     break;
+      //   case 'title':
+      //     _THEME_SEL_REGION_FILL_COLOR = '#ffff00';
+      //     break;
+      // }
+
+      for (var key in legendList){
+        if( _current_type === key){
+          _THEME_SEL_REGION_FILL_COLOR = legendList[key];
           break;
-        case 'graphic':
-          _THEME_SEL_REGION_FILL_COLOR = '#ff0000';
-          break;
-        case 'equation':
-          _THEME_SEL_REGION_FILL_COLOR = '#0000ff';
-          break;
-        case 'title':
-          _THEME_SEL_REGION_FILL_COLOR = '#ffff00';
-          break;
+        }
       }
 
         // de-select all other regions if the user has not pressed Shift
@@ -2390,9 +2300,14 @@ _reg_canvas.addEventListener('mouseup', function(e) {
           // handled by _is_user_drawing polygon
           break;
         }
-    } else {
+
+        show_modal_for_attribute();
+    }
+     else {
       show_message('Cannot add such a small region');
     }
+
+
     update_attributes_panel();
     _redraw_reg_canvas();
     _reg_canvas.focus();
@@ -2685,7 +2600,7 @@ _reg_canvas.addEventListener('mousemove', function(e) {
   }
 });
 
-
+}
 //
 // Canvas update routines
 //
@@ -2848,6 +2763,7 @@ function change_region(region_type){
   _current_type = _img_metadata[_image_id].regions[_user_sel_region_id].shape_attributes.type;
   _THEME_SEL_REGION_FILL_COLOR = legendList[region_type]
   _redraw_reg_canvas();
+  update_region_attributes_input_panel();
 }
 
 // control point for resize of region boundaries
@@ -3690,7 +3606,6 @@ function _update_ui_components() {
   }
 }
 
-
 function del_sel_regions() {
   if ( !_current_image_loaded ) {
     show_message('First load some images!');
@@ -3722,6 +3637,65 @@ function del_sel_regions() {
   _is_all_region_selected = false;
   _is_region_selected     = false;
   _user_sel_region_id     = -1;
+
+  if (_is_reg_attr_panel_visible)
+      toggle_reg_attr_panel();
+
+  if ( _canvas_regions.length === 0 ) {
+    // all regions were deleted, hence clear region canvas
+    _clear_reg_canvas();
+  } else {
+    _redraw_reg_canvas();
+  }
+  _reg_canvas.focus();
+  update_attributes_panel();
+  save_current_data_to_browser_cache();
+
+  show_message('Deleted ' + del_region_count + ' selected regions');
+}
+
+
+function del_sel_and_toggle_regions() {
+  if ( !_current_image_loaded ) {
+    show_message('First load some images!');
+    return;
+  }
+
+  var del_region_count = 0;
+  if ( _is_all_region_selected ) {
+    del_region_count = _canvas_regions.length;
+    _canvas_regions.splice(0);
+    _img_metadata[_image_id].regions.splice(0);
+  } else {
+    var sorted_sel_reg_id = [];
+    for ( var i = 0; i < _canvas_regions.length; ++i ) {
+      if ( _canvas_regions[i].is_user_selected ) {
+        sorted_sel_reg_id.push(i);
+      }
+    }
+    sorted_sel_reg_id.sort( function(a,b) {
+      return (b-a);
+    });
+    var selected_num;
+    if (sorted_sel_reg_id.length == 0){
+      selected_num = _selected_while_input;
+    }
+    else{
+      selected_num = sorted_sel_reg_id[0];
+    }
+    // for ( var i = 0; i < sorted_sel_reg_id.length; ++i ) {
+      _canvas_regions.splice( selected_num, 1);
+      _img_metadata[_image_id].regions.splice( selected_num, 1);
+      del_region_count += 1;
+    // }
+  }
+
+  _is_all_region_selected = false;
+  _is_region_selected     = false;
+  _user_sel_region_id     = -1;
+
+  if (_is_reg_attr_panel_visible)
+      toggle_reg_attr_panel();
 
   if ( _canvas_regions.length === 0 ) {
     // all regions were deleted, hence clear region canvas
@@ -4052,7 +4026,9 @@ function attr_input_blur(i) {
 
 // header is a Set()
 // data is an array of Map() objects
-function init_spreadsheet_input(type, col_headers, data, row_names) {
+
+
+function init_spreadsheet_input(type, col_headers, data, attr_id, row_names) {
 
   if ( typeof row_names === 'undefined' ) {
     var row_names = [];
@@ -4060,6 +4036,12 @@ function init_spreadsheet_input(type, col_headers, data, row_names) {
       row_names[i] = i+1;
     }
   }
+
+  // console.log("type: " + type);
+  // console.log(col_headers);
+  // console.log(data);
+  // console.log(row_names);
+  // console.log(_region_attributes );
   var attrname = '';
   switch(type) {
   case 'region_attributes':
@@ -4071,24 +4053,7 @@ function init_spreadsheet_input(type, col_headers, data, row_names) {
     break;
   }
 
-  var attrtable = document.createElement('table');
-  attrtable.setAttribute('id', 'attributes_panel_table');
-  var firstrow = attrtable.insertRow(0);
 
-  // top-left cell
-  var topleft_cell = firstrow.insertCell(0);
-  topleft_cell.innerHTML = '';
-  topleft_cell.style.border = 'none';
-
-  for (var col_header in col_headers) {
-    firstrow.insertCell(-1).innerHTML = '<b>' + col_header + '</b>';
-  }
-  // allow adding new attributes
-  firstrow.insertCell(-1).innerHTML = '<input type="text"' +
-    ' onchange="add_new_attribute(\'' + type[0] + '\', this.value)"' +
-    ' value = "[ Add New ]"' +
-    ' onblur="_is_user_adding_attribute_name=false; this.value = \'\';"' +
-    ' onfocus="_is_user_adding_attribute_name=true; this.value = \'\';" />';
 
   // if multiple regions are selected, show the selected regions first
   var sel_reg_list       = [];
@@ -4110,11 +4075,37 @@ function init_spreadsheet_input(type, col_headers, data, row_names) {
     } else {
       region_traversal_order = all_reg_list;
     }
-  }
+
+
+
+  var attrtable = document.createElement('table');
+  attrtable.setAttribute('id', 'attributes_panel_table');
+  var firstrow = attrtable.insertRow(0);
+
+  // top-left cell
+  var topleft_cell = firstrow.insertCell(0);
+  topleft_cell.innerHTML = '';
+  topleft_cell.style.border = 'none';
+
+  // console.log("data---");
+  // console.log(data);
+  // console.log(type);
+  // console.log(sel_reg_list);
+  // console.log("----");
+
+  // allow adding new attributes
+  // console.log(type[0]);
+  // firstrow.insertCell(-1).innerHTML = '<input type="text"' +
+  //   ' onchange="add_new_attribute(\'' + type[0] + '\', this.value)"' +
+  //   ' value = "[ Add New ]"' +
+  //   ' onblur="_is_user_adding_attribute_name=false; this.value = \'\';"' +
+  //   ' onfocus="_is_user_adding_attribute_name=true; this.value = \'\';" />';
+
+
 
   var sel_rows = [];
-  for ( var i=0; i < data.length; ++i ) {
-    var row_i = i;
+  // for ( var i=0; i < sel_reg_list.length; ++i ) {
+    var row_i = sel_reg_list[0];
 
     // if multiple regions are selected, show the selected regions first
     var di;
@@ -4122,9 +4113,29 @@ function init_spreadsheet_input(type, col_headers, data, row_names) {
       if ( sel_reg_list.length ) {
         row_i = region_traversal_order[row_i];
       }
-      di = data[row_i].region_attributes;
+      di = {}
+      di[data[row_i].shape_attributes.type] = "";
     } else {
       di = data[row_i];
+    }
+
+    var selected_num;
+    if (sel_reg_list.length == 0){
+      selected_num = row_i;
+    }
+    else {
+      selected_num = sel_reg_list[0];
+    }
+    for (var col_header in _region_attributes ) {
+        if(col_header == data[selected_num].shape_attributes.type){
+          for (var col in _region_attributes [col_header]){
+            // col_headers.push(_region_attributes [col_header][col])
+            var mark = "";
+            if( _region_attributes [col_header][col].att_type)
+                mark = "<sup style='color: red; font-size:18px'>&#42;<sup>";
+                  firstrow.insertCell(-1).innerHTML = '<b>' + _region_attributes [col_header][col].att_name + mark  + '</b>';
+          }
+        }
     }
 
     var row = attrtable.insertRow(-1);
@@ -4133,49 +4144,55 @@ function init_spreadsheet_input(type, col_headers, data, row_names) {
     region_id_cell.style.fontWeight = 'bold';
     region_id_cell.style.width      = '2em';
 
+
+
     if (data[row_i].is_user_selected) {
       region_id_cell.style.backgroundColor = '#5599FF';
       row.style.backgroundColor = '#f2f2f2';
       sel_rows.push(row);
     }
 
+    // console.log("__col __ headers ___");
+    // console.log(col_headers);
+    // console.log("-------");
+    _selected_while_input = row_i;
+    _img_metadata[_image_id].regions[row_i].is_user_selected = true;
     for ( var key in col_headers ) {
-      var input_id = type[0] + '#' + key + '#' + row_i;
+      var input_id = type[0] + '#' + key + '#' + _img_metadata[_image_id].regions[row_i].image_region_id;
+          if ( di.hasOwnProperty(key) ){
+          // var ip_val = di[key];
+          for (var col in _region_attributes [key]){
+            if(attributes_values.hasOwnProperty(input_id+'#'+col)){
+                row.insertCell(-1).innerHTML = '<input type="text"' +
+                ' id="' + input_id + '#'+ col + '"' +
+                ' value="' + attributes_values[input_id+'#'+col] + '"' +
+                ' onchange="update_attribute_value(\'' + input_id + '#' + col + '\', \'' + _region_attributes[key][col].att_name + '\', \'' + row_i + '\', this.value)" ' +
+                ' onblur="attr_input_blur(' + row_i + ')"' +
+                ' onfocus="attr_input_focus(' + row_i + ');" />';
+            }
+            else{
+                  row.insertCell(-1).innerHTML = '<input type="text"' +
+                  ' id="' + input_id + '#'+ col + '"' +
+                  ' onchange="update_attribute_value(\'' + input_id + '#' + col + '\', \'' + _region_attributes[key][col].att_name + '\', \'' + row_i + '\', this.value)" ' +
+                  ' onblur="attr_input_blur(' + row_i + ')"' +
+                  ' onfocus="attr_input_focus(' + row_i + ');" />';
+            }
+          }
 
-      if ( di.hasOwnProperty(key) ) {
-        var ip_val = di[key];
-        // escape all single and double quotes
-        ip_val = ip_val.replace(/'/g, '\'');
-        ip_val = ip_val.replace(/"/g, '&quot;');
-
-        if ( ip_val.length > 30 ) {
-          row.insertCell(-1).innerHTML = '<textarea ' +
-            ' rows="' + (Math.floor(ip_val.length/30)-1) + '"' +
-            ' cols="30"' +
-            ' id="' +   input_id + '"' +
-            ' autocomplete="on"' +
-            ' onchange="update_attribute_value(\'' + input_id + '\', this.value)"' +
-            ' onblur="attr_input_blur(' + row_i + ')"' +
-            ' onfocus="attr_input_focus(' + row_i + ');"' +
-            ' >' + ip_val + '</textarea>';
-        } else {
-          row.insertCell(-1).innerHTML = '<input type="text"' +
-            ' id="' +   input_id + '"' +
-            ' value="' + ip_val + '"' +
-            ' autocomplete="on"' +
-            ' onchange="update_attribute_value(\'' + input_id + '\', this.value)"' +
-            ' onblur="attr_input_blur(' + row_i + ')"' +
-            ' onfocus="attr_input_focus(' + row_i + ');" />';
         }
-      } else {
-        row.insertCell(-1).innerHTML = '<input type="text"' +
-          ' id="' + input_id + '"' +
-          ' onchange="update_attribute_value(\'' + input_id + '\', this.value)" ' +
-          ' onblur="attr_input_blur(' + row_i + ')"' +
+      else{
+      if ( key == data[sel_reg_list[0]].shape_attributes.type ) {
+        for (var col in _region_attributes [key]){
+          row.insertCell(-1).innerHTML = '<input type="text"' +
+          ' id="' + input_id + '#'+ col + '"' +
+          ' onchange="update_attribute_value(\'' + input_id + '#' + col + '\', \'' + _region_attributes[key][col].att_name + '\', \'' + row_i + '\', this.value)" ' +          ' onblur="attr_input_blur(' + row_i + ')"' +
           ' onfocus="attr_input_focus(' + row_i + ');" />';
+        }
       }
     }
-  }
+    }
+    _img_metadata[_image_id].regions[row_i].is_user_selected = true;
+  // }
 
   attributes_panel.replaceChild(attrtable, document.getElementById('attributes_panel_table'));
   attributes_panel.focus();
@@ -4193,6 +4210,157 @@ function init_spreadsheet_input(type, col_headers, data, row_names) {
     attributes_panel.scrollTop = 0;
   }
 }
+}
+
+
+// function init_spreadsheet_input(type, col_headers, data, row_names) {
+
+//   if ( typeof row_names === 'undefined' ) {
+//     var row_names = [];
+//     for ( var i = 0; i < data.length; ++i ) {
+//       row_names[i] = i+1;
+//     }
+//   }
+
+//   console.log("type: " + type);
+//   console.log("col_headers: " + col_headers);
+//   console.log(data);
+//   console.log("row_names: " + row_names);
+//   console.log(_region_attributes );
+//   var attrname = '';
+//   switch(type) {
+//   case 'region_attributes':
+//     attrname = 'Region Attributes';
+//     break;
+
+//   case 'file_attributes':
+//     attrname = 'File Attributes';
+//     break;
+//   }
+
+//   var attrtable = document.createElement('table');
+//   attrtable.setAttribute('id', 'attributes_panel_table');
+//   var firstrow = attrtable.insertRow(0);
+
+//   // top-left cell
+//   var topleft_cell = firstrow.insertCell(0);
+//   topleft_cell.innerHTML = '';
+//   topleft_cell.style.border = 'none';
+
+//   for (var col_header in col_headers) {
+//     firstrow.insertCell(-1).innerHTML = '<b>' + col_header + '</b>';
+//   }
+//   // allow adding new attributes
+//   console.log(type[0]);
+//   firstrow.insertCell(-1).innerHTML = '<input type="text"' +
+//     ' onchange="add_new_attribute(\'' + type[0] + '\', this.value)"' +
+//     ' value = "[ Add New ]"' +
+//     ' onblur="_is_user_adding_attribute_name=false; this.value = \'\';"' +
+//     ' onfocus="_is_user_adding_attribute_name=true; this.value = \'\';" />';
+
+//   // if multiple regions are selected, show the selected regions first
+//   var sel_reg_list       = [];
+//   var remaining_reg_list = [];
+//   var all_reg_list       = [];
+//   var region_traversal_order = [];
+//   if (type === 'region_attributes') {
+//     // count number of selected regions
+//     for ( var i = 0; i < data.length; ++i ) {
+//       all_reg_list.push(i);
+//       if ( data[i].is_user_selected ) {
+//         sel_reg_list.push(i);
+//       } else {
+//         remaining_reg_list.push(i);
+//       }
+//     }
+//     if ( sel_reg_list.length > 1 ) {
+//       region_traversal_order = sel_reg_list.concat(remaining_reg_list);
+//     } else {
+//       region_traversal_order = all_reg_list;
+//     }
+//   }
+
+//   var sel_rows = [];
+//   for ( var i=0; i < data.length; ++i ) {
+//     var row_i = i;
+
+//     // if multiple regions are selected, show the selected regions first
+//     var di;
+//     if ( type === 'region_attributes' ) {
+//       if ( sel_reg_list.length ) {
+//         row_i = region_traversal_order[row_i];
+//       }
+//       di = data[row_i].region_attributes;
+//     } else {
+//       di = data[row_i];
+//     }
+
+//     var row = attrtable.insertRow(-1);
+//     var region_id_cell              = row.insertCell(0);
+//     region_id_cell.innerHTML        = '' + row_names[row_i] + '';
+//     region_id_cell.style.fontWeight = 'bold';
+//     region_id_cell.style.width      = '2em';
+
+//     if (data[row_i].is_user_selected) {
+//       region_id_cell.style.backgroundColor = '#5599FF';
+//       row.style.backgroundColor = '#f2f2f2';
+//       sel_rows.push(row);
+//     }
+
+//     for ( var key in col_headers ) {
+//       var input_id = type[0] + '#' + key + '#' + row_i;
+
+//       if ( di.hasOwnProperty(key) ) {
+//         var ip_val = di[key];
+//         // escape all single and double quotes
+//         ip_val = ip_val.replace(/'/g, '\'');
+//         ip_val = ip_val.replace(/"/g, '&quot;');
+
+//         if ( ip_val.length > 30 ) {
+//           row.insertCell(-1).innerHTML = '<textarea ' +
+//             ' rows="' + (Math.floor(ip_val.length/30)-1) + '"' +
+//             ' cols="30"' +
+//             ' id="' +   input_id + '"' +
+//             ' autocomplete="on"' +
+//             ' onchange="update_attribute_value(\'' + input_id + '\', this.value)"' +
+//             ' onblur="attr_input_blur(' + row_i + ')"' +
+//             ' onfocus="attr_input_focus(' + row_i + ');"' +
+//             ' >' + ip_val + '</textarea>';
+//         } else {
+//           row.insertCell(-1).innerHTML = '<input type="text"' +
+//             ' id="' +   input_id + '"' +
+//             ' value="' + ip_val + '"' +
+//             ' autocomplete="on"' +
+//             ' onchange="update_attribute_value(\'' + input_id + '\', this.value)"' +
+//             ' onblur="attr_input_blur(' + row_i + ')"' +
+//             ' onfocus="attr_input_focus(' + row_i + ');" />';
+//         }
+//       } else {
+//         row.insertCell(-1).innerHTML = '<input type="text"' +
+//           ' id="' + input_id + '"' +
+//           ' onchange="update_attribute_value(\'' + input_id + '\', this.value)" ' +
+//           ' onblur="attr_input_blur(' + row_i + ')"' +
+//           ' onfocus="attr_input_focus(' + row_i + ');" />';
+//       }
+//     }
+//   }
+
+//   attributes_panel.replaceChild(attrtable, document.getElementById('attributes_panel_table'));
+//   attributes_panel.focus();
+
+//   // move vertical scrollbar automatically to show the selected region (if any)
+//   if ( sel_rows.length === 1 ) {
+//     var panelHeight = attributes_panel.offsetHeight;
+//     var sel_row_bottom = sel_rows[0].offsetTop + sel_rows[0].clientHeight;
+//     if (sel_row_bottom > panelHeight) {
+//       attributes_panel.scrollTop = sel_rows[0].offsetTop;
+//     } else {
+//       attributes_panel.scrollTop = 0;
+//     }
+//   } else {
+//     attributes_panel.scrollTop = 0;
+//   }
+// }
 
 function update_attributes_panel(type) {
   if (_current_image_loaded &&
@@ -4208,10 +4376,11 @@ function update_attributes_panel(type) {
   }
 }
 
-function update_region_attributes_input_panel() {
+function update_region_attributes_input_panel(attr_id) {
   init_spreadsheet_input('region_attributes',
                          _region_attributes,
-                         _img_metadata[_image_id].regions);
+                         _img_metadata[_image_id].regions,
+                         attr_id);
 
 }
 
@@ -4222,8 +4391,9 @@ function update_file_attributes_input_panel() {
                          [_current_image_filename]);
 }
 
+
 function toggle_attributes_input_panel() {
-  if( _is_reg_attr_panel_visible ) {
+  if( _is_reg_attr_panel_visible ) { // && required_attributes_filled()
     toggle_reg_attr_panel();
   }
   if( _is_file_attr_panel_visible ) {
@@ -4232,9 +4402,18 @@ function toggle_attributes_input_panel() {
 }
 
 function toggle_reg_attr_panel() {
+
+  if(!_is_reg_attr_panel_visible){
+    for ( var shape_name in _REGION_SHAPE ) {
+        var ui_element = document.getElementById('region_shape_' + _REGION_SHAPE[shape_name]);
+        ui_element.classList.remove('selected');
+    }
+     _current_shape = "";
+  }
+ 
   if ( _current_image_loaded ) {
-    var panel = document.getElementById('reg_attr_panel_button');
-    panel.classList.toggle('active');
+    // var panel = document.getElementById('reg_attr_panel_button');
+    // panel.classList.toggle('active');
     if ( _is_attributes_panel_visible ) {
       if( _is_reg_attr_panel_visible ) {
         attributes_panel.style.display   = 'none';
@@ -4242,21 +4421,22 @@ function toggle_reg_attr_panel() {
         _is_reg_attr_panel_visible   = false;
         _reg_canvas.focus();
         // add horizontal spacer to allow scrollbar
-        var hs = document.getElementById('horizontal_space');
-        hs.style.height = attributes_panel.offsetHeight+'px';
+        // var hs = document.getElementById('horizontal_space');
+        // hs.style.height = attributes_panel.offsetHeight+'px';
 
       } else {
         update_region_attributes_input_panel();
         _is_reg_attr_panel_visible  = true;
         _is_file_attr_panel_visible = false;
         // de-activate the file-attr accordion panel
-        var panel = document.getElementById('file_attr_panel_button');
-        panel.classList.toggle('active');
+        // var panel = document.getElementById('file_attr_panel_button');
+        // panel.classList.toggle('active');
         attributes_panel.focus();
       }
     } else {
-      _is_attributes_panel_visible = true;
+
       update_region_attributes_input_panel();
+       _is_attributes_panel_visible = true;
       _is_reg_attr_panel_visible = true;
       attributes_panel.style.display = 'block';
       attributes_panel.focus();
@@ -4302,16 +4482,25 @@ function update_vertical_space() {
   panel.style.height = attributes_panel.offsetHeight+'px';
 }
 
-function update_attribute_value(attr_id, value) {
+function update_attribute_value(attr_id, att_name, regionId, value) {
   var attr_id_split = attr_id.split('#');
   var type = attr_id_split[0];
-  var attribute_name = attr_id_split[1];
-  var region_id = attr_id_split[2];
+  var attribute_name = att_name;
+  var region_id = regionId;
 
   switch(type) {
   case 'r': // region attribute
-    _img_metadata[_image_id].regions[region_id].region_attributes[attribute_name] = value;
-    update_region_attributes_input_panel();
+    if( value !== ""){
+      _img_metadata[_image_id].regions[region_id].region_attributes[attribute_name] = value;
+      attributes_values[attr_id] = value;
+      update_region_attributes_input_panel(attr_id);
+    }
+    else {
+      delete _img_metadata[_image_id].regions[region_id].region_attributes[attribute_name];
+      attributes_values[attr_id] = value;
+      update_region_attributes_input_panel();
+    }
+
     break;
 
   case 'f': // file attribute
@@ -4348,43 +4537,50 @@ function add_new_attribute(type, attribute_name) {
 
 function display_add_region_popup() {
   // Get the modal
-var modal = document.getElementById('myModal');
+  var modal = document.getElementById('myModal');
 
-// // Get the button that opens the modal
-// var btn = document.getElementById("myBtn");
+  // // Get the button that opens the modal
+  // var btn = document.getElementById("myBtn");
 
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
 
-// When the user clicks on the button, open the modal 
-// btn.onclick = function() {
-  modal.style.display = "block";
-// }
+  // When the user clicks on the button, open the modal
+  // btn.onclick = function() {
+    modal.style.display = "block";
+  // }
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
     modal.style.display = "none";
   }
-}
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
 }
 
-function validateFormOnSubmit(){
-  var region_name = document.getElementById("region_name");
-  var region_color = document.getElementById("region_color");
+function validateFormOnSubmit(data){
+  var region_name = document.getElementById(data["region_name_id"]);
+  var region_color = document.getElementById(data["region_color_id"]);
+  var region_description = document.getElementById(data["region_desc_id"]);
+  // console.log(region_name);
+  // console.log(region_color);
+  // console.log(region_description);
+
   if(region_name.value != "" ) {
     console.log("submitted")
     legendList[region_name.value] = region_color.value;
-    populate_region_list(legendList);
+    legendListDesc[region_name.value] = region_description.value;
+    populate_region_list(legendList, label_id);
     var modal = document.getElementById('myModal');
     modal.style.display = "none";
   }
+
+  region_name.value = "";
+  region_color.value = "";
+  region_description.value = "";
 }
-    </script>
-  </body>
-</html>
