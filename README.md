@@ -1,25 +1,70 @@
 # Demo-OCR
-
-Include the *scripts.js* file into your HTML file.
+Include the *seg-tool-styles.css* file into the <*head*> tag of your HTML file.
 ```HTML
-<script type="text/javascript" src="scripts.js"></script>
+<link rel="stylesheet" href="admin-config-styles.css">
+```
+Include the *seg-tool-scripts.js* file at the end of your HTML file.
+```HTML
+<script type="text/javascript" src="seg-tool-scripts.js"></script>
 ```
  
  The *scripts.js* file can be initialized using *_init()* function. It requires a javascript object as an input.
  ```HTML
- <script type="text/javascript">
-     _init(javascript object)
- </script>
+<script type="text/javascript">
+
+      var data = {
+        container_id: "master",
+        shapes: [
+          {
+            name: 'rectangle',
+            code: 'rect',
+            region_shape: 'RECT'
+          },
+          {
+            name: 'circle',
+            code: 'circle',
+            region_shape: 'CIRCLE'
+          },
+          {
+            name: 'polygon',
+            code: 'polygon',
+            region_shape: 'POLYGON'
+          },
+          {
+            name: 'ellipse',
+            code: 'ellipse',
+            region_shape: 'ELLIPSE'
+          },
+
+        ]
+      };
+
+      // get the saved JSON data to this variable(json_data)
+      var json_data = '{}';
+      try{
+        var read_json = JSON.parse(json_data); 
+      }
+      catch(err){
+        read_json = {region:[]}
+      }
+
+
+      data["region"] = read_json["region"];
+
+      // initialize the seg tool
+      _init(data);
+
+    </script>
  ```
  
  The object should have the following properties:   
- * *container_div*
+ * *container_id*
  * *region*
  * *shapes*    
  
-The *region_div* property carries the id of the container for rendering regions.
+The *container_id* property carries the id of the container for rendering the tool.
 ```Javascript
-container_div: "container id"
+container_id: "container id"
 ```
 
 The *region* is an array of objects, each object specifying a region.
@@ -44,10 +89,6 @@ region: [
           .]
 ```
 
-The *shape_id* property takes in the id of the container specified for rendering shapes.
-```Javascript
-shape_id: "id"
-```
 
 *shapes* is similar to *region* property, an array of objects, with each object defining a shape to be rendered.
 ```Javascript
@@ -69,7 +110,7 @@ shapes: [
 
 
 
-## Example
+## This will how your final data will look like when you will be passing it to the _init function
 ```Javascript
 _init({
         container_id: "master",
