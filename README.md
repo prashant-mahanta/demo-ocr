@@ -52,7 +52,7 @@ Include the *seg-tool-scripts.js* file at the end of your HTML file.
       data["region"] = read_json["region"];
 
       // initialize the seg tool
-      _init(data);
+      _init_seg_tool(data);
 
     </script>
  ```
