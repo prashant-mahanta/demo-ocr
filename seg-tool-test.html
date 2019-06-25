@@ -54,7 +54,8 @@
         ]
       };
 
-      // get the saved JSON data to this variable 
+      // get the saved JSON data to this variable(json_data) 
+      var json_data = '{}';
       try{
         var read_json = JSON.parse(); 
       }
@@ -66,7 +67,7 @@
       data["region"] = read_json["region"];
 
       // initialize the seg tool
-      _init(data);
+      _init_seg_tool(data);
 
     </script>
 
