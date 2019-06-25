@@ -552,7 +552,7 @@ function populate_popup() {
 }
 
 
-function _init(event) {
+function _init_seg_tool(event) {
   show_body(event["container_id"]);
   set_variables();
   init_canvas("image_canvas", "region_canvas");
