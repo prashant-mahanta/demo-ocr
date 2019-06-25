@@ -22,7 +22,7 @@ container: "container_id"
 
 # How to export the JSON data
 ## 1. 
-You can click on the  *Export* button the get the JSON data of the selected regions. By clicking on that button a JSON file will be downloaded.
+You can click on the  *Export* button to get the JSON data of the selected regions. By clicking on that button a JSON file will be downloaded.
 
 ## 2.
 To get the JSON data simply call the function *get_data()* you will get the JSON data of the selected regions as a string. You can convert it to JSON by following
