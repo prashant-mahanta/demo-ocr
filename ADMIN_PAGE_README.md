@@ -12,8 +12,8 @@ Include the *admin-config-scripts.js* file into your HTML file.
 The *admin-config-scripts.js* can be intialized using *init()* function. It requires a javascript object
 ```HTML
     <script type="text/javascript">
-			init({container: "master"})
-		</script>
+			_init_admin_config({container: "master"})
+    </script>
 ```
 The object contains the div of the container where the admin tool will be rendered
 ```
