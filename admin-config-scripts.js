@@ -41,7 +41,7 @@ var region_json = {region: [
     }
 ]};
 
-function init(event) {
+function _init_admin_config(event) {
 	master = document.getElementById(event["container"]);
 	populate_pre_defined_regions();
 	//show_popup();
