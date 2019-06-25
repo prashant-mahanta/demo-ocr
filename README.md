@@ -110,9 +110,9 @@ shapes: [
 
 
 
-## This will how your final data will look like when you will be passing it to the _init function
+## This will how your final data will look like when you will be passing it to the _init_seg_tool function
 ```Javascript
-_init({
+_init_seg_tool({
         container_id: "master",
         region: [
           {
