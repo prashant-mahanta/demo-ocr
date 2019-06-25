@@ -1,14 +1,14 @@
 # Demo-OCR
 Include the *seg-tool-styles.css* file into the <*head*> tag of your HTML file.
 ```HTML
-<link rel="stylesheet" href="admin-config-styles.css">
+<link rel="stylesheet" href="seg-tools-styles.css">
 ```
 Include the *seg-tool-scripts.js* file at the end of your HTML file.
 ```HTML
 <script type="text/javascript" src="seg-tool-scripts.js"></script>
 ```
  
- The *scripts.js* file can be initialized using *_init()* function. It requires a javascript object as an input.
+ The *scripts.js* file can be initialized using *_init_seg_tool()* function. It requires a javascript object as an input.
  ```HTML
 <script type="text/javascript">
 
