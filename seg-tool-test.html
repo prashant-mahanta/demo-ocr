@@ -57,7 +57,7 @@
       // get the saved JSON data to this variable(json_data) 
       var json_data = '{}';
       try{
-        var read_json = JSON.parse(); 
+        var read_json = JSON.parse(json_data); 
       }
       catch(err){
         read_json = {region:[]}
