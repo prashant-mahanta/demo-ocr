@@ -1,6 +1,6 @@
 # Demo-OCR
 
-## Latest Release: (Version 1.1)[https://github.com/prashant-mahanta/demo-ocr/tree/version1.1]
+## Latest Release: [Version 1.1](https://github.com/prashant-mahanta/demo-ocr/tree/version1.1)
 Include the *scripts.js* file into your HTML file.
 ```HTML
 <script type="text/javascript" src="scripts.js"></script>
